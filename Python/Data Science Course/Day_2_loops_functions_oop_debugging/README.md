@@ -1,0 +1,13 @@
+## Day 2:
+- Loops and Control Statements  
+	- while loop
+	- for loop
+	- break, continue, and pass
+- List comprehension
+- Functions
+- Lambda expression
+- range, map and filter
+- Objected Oriented Programming (OOP)
+	- Classes, inheritance
+- Exception handling - debugging
+- Lab and home work on Functions and classes 
