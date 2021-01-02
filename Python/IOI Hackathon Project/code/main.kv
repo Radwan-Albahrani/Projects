@@ -1,0 +1,10 @@
+#:include propertymapview.kv
+
+BoxLayout:
+    orientation: 'vertical'
+    MDToolbar:
+        title: "Property Finder"
+        right_action_items: [['magnify', lambda x: app.search_menu.open()]]
+        md_bg_color: app.theme_cls.primary_color
+    PropertyMapView:
+        id: Mapview

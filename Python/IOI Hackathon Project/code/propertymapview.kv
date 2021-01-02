@@ -1,0 +1,12 @@
+#:import MapView kivy.garden.mapview.MapView
+
+<PropertyMapView>:
+    lat: 3.139
+    lon: 101.686
+    zoom: 10
+    on_zoom: 
+        self.zoom = 10 if self.zoom < 10 else self.zoom
+    on_lat:
+        self.start_getting_properties_in_fov()
+    on_lon:
+        self.start_getting_properties_in_fov()
