@@ -47,9 +47,9 @@ int argcheck(int argc, string argv[])
         //Start a for loop to check for any digits in given Argument
         for (int i = 0; i < n; i++)
         {
-            int digit = isdigit(argv[1][i]);
+            int notAlpha = isalpha(argv[1][i]);
             //If a digit is found anywhere, tell the user that digits arent allowed, and stop the program by returning 1.
-            if (digit != 0)
+            if (notAlpha == 0)
             {
                 printf("Key must contain only alphabetic characters.\n");
                 return 1;
