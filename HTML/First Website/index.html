@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+    
+        <script>
+
+            // Function to add listeners to all buttons in multiple choice question
+            function multiple()
+            {
+                // Get all buttons in a list.
+                let buttons = document.querySelectorAll("button");
+                
+                // Loop through buttons
+                for (let index = 0; index < buttons.length; index++) 
+                {
+                    // For every button, add a listener that attaches the button to the check function, sending in proper arguments needed.
+                    buttons[index].addEventListener("click", function(){checkMultiple(buttons, buttons[index].id, index)});
+
+                }
+            }
+
+
+            // Function to check multiple choice questions. requires ID, buttons, and index.
+            function checkMultiple(buttons, id, index)
+            {
+                // First get the text area under question to provide response.
+                let someText = document.getElementById("MultipleAnswer")
+                
+                // If question was unanswered and the button clicked was correct, 
+                if (id == "Correct1" && someText.innerHTML == "")
+                {
+                    // Turn the button green
+                    buttons[index].style.backgroundColor = "Green";
+                    // Disable all buttons
+                    for (let index = 0; index < buttons.length; index++) 
+                    {
+                        buttons[index].disabled = "Disabled"
+                        
+                    }
+                    // Tell user answer is correct.
+                    someText.innerHTML = "Correct!"
+                }
+                
+                // If the button is incorrect and the question was unanswered
+                else if(id == "False" && someText.innerHTML == "")
+                {
+                    // Turn the button red.
+                    buttons[index].style.backgroundColor = "Red";
+                    // Disable All buttons.
+                    for (let index = 0; index < buttons.length; index++) 
+                    {
+                        buttons[index].disabled = "Disabled"
+                        
+                    }
+                    // Tell user the answer is Incorrect.
+                    someText.innerHTML = "Incorrect"
+                }
+            }
+
+            
+            // Function to Check Free response question
+            function checkFree()
+            {
+                // Get the input box
+                answer = document.querySelector("#name");
+
+                // Get the space to inform the user of the answer
+                freeText = document.getElementById("FreeAnswer")
+
+                // Check Answer Value based on given response. 
+                if (answer.value.toUpperCase() == "FISCHBACH" && freeText.innerHTML == "")
+                {
+                    // If correct, provide the user with feedback
+                    answer.style.backgroundColor = "Green";
+
+                    // Disallow user from trying more answers
+                    answer.disabled = "disabled"
+
+                    // Let user know he was correct.
+                    freeText.innerHTML = "Correct!";
+                }
+                
+                // Do the same for incorrect answers.
+                else if (answer.value.toUpperCase()  != "FISCHBACH" && freeText.innerHTML == "")
+                {
+                    answer.style.backgroundColor = "Red";
+                    answer.disabled = "disabled"
+                    freeText.innerHTML = "Incorrect"
+                }
+                return false;
+            }
+
+            // Wait for whole page to load before calling multiple.
+            document.addEventListener("DOMContentLoaded", multiple);
+
+        </script>
+    </head>
+    <body>
+
+        <div class="jumbotron">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+                
+                <h3>
+                    What is Markiplier's Podcast Called?
+                </h3>
+                <button id="False">Darkiplier</button>
+                <button id="False">Decepticons</button>
+                <button id="Correct1">Distractible</button>
+                <button id="False">A Heist With Markiplier</button>
+                <button id="False">Papers Please</button>
+                <p id="MultipleAnswer"></p>
+
+            </div>
+
+            <div class="section">
+                <h2>Part 2: Free Response</h2>
+                <hr>
+
+                <h3>
+                    Whats Markipliers Real Last Name?
+                </h3>
+                <form onsubmit="checkFree(); return false;">
+                    <input id = "name" type="text" placeholder="Answer?" autocapitalize="On" autocomplete="Off", style="text-transform: capitalize;">
+                    <input type="submit">
+                    
+                </form>
+                <p id="FreeAnswer"></p>
+
+            </div>
+
+        </div>
+
+    </body>
+</html>
