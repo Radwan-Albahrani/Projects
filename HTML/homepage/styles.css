@@ -1,0 +1,266 @@
+@import url(https://fonts.googleapis.com/css?family=Walter+Turncoat);
+@import url('https://fonts.cdnfonts.com/css/sh-pinscher');
+
+.navigation 
+{
+    background-color: #181b1f;
+    box-sizing: border-box;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    position: fixed;
+    width: 100%;
+    z-index: 2;
+}
+
+.navigation_links
+{
+    align-items: center;
+    text-align: center;
+    text-transform: capitalize;
+    
+    justify-content: space-around;
+    display: flex;
+
+    height: 5vh;
+    padding: 2%;
+    
+    font-size: 120%;
+}
+
+.navigation_link
+{
+    color: #a4a8a4;
+    text-decoration: none;
+    transition: color .3s,font-size .2s;
+}
+
+.navigation_link:hover
+{
+    color: white;
+    font-size: 140%;
+}
+
+.bg-image
+{
+    background-repeat:round;
+    background-attachment: fixed;
+    background-size: auto;
+}
+
+.main
+{
+    padding-top: 10%;
+    padding-bottom: 10%;
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: fixed;  
+}
+
+.header
+{
+    font-size: 10vw;
+    font-weight: 300;
+    width: 100%;
+    height: 100%;
+    justify-content:center;
+    padding-top: 10%;
+    color: aliceblue;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-shadow:
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000,
+    3px 3px 0 #000; 
+    
+}
+
+.paragraphs
+{
+    font-size: 2vw;
+    font-weight: 200;
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: black;
+    
+    text-align: justify;
+    text-shadow:
+    -0.1vw -0.1vw 0 aliceblue,
+    0.1vw -0.1vw 0 aliceblue,
+    -0.1vw 0.1vw 0 aliceblue,
+    0.1vw 0.1vw 0 aliceblue; 
+}
+
+.paragraphs2
+{
+    font-size: 2vw;
+    font-weight: 200;
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: white;
+    
+    text-align: justify;
+    text-shadow:
+    -0.1vw -0.1vw 0 #000,
+    0.1vw -0.1vw 0 #000,
+    -0.1vw 0.1vw 0 #000,
+    0.1vw 0.1vw 0 #000; 
+}
+
+
+
+.card
+{
+    width: 100%;
+    height: 40rem;
+    
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 120%;
+    color: aliceblue;
+
+    background-color: gray;
+    background-attachment: fixed;
+    background-position: center;  
+    background-size:cover;
+    opacity: 90%;
+    
+    border-width: 0.4rem;
+    border-color: darkgray;
+    border-radius: 5%;
+
+    padding: 10%;
+    transition: padding .2s;
+
+    text-shadow:
+    -0.1vw -0.1vw 0 #000,
+    0.1vw -0.1vw 0 #000,
+    -0.1vw 0.1vw 0 #000,
+    0.1vw 0.1vw 0 #000; 
+}
+
+.card:hover
+{
+    padding: 0%;
+}
+
+.card-title
+{
+    font-size: 200%;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 300;
+    
+    text-shadow: 
+    -0.2vw -0.2vw 0 darkgray,
+    0.2vw -0.2vw 0 darkgray,
+    -0.2vw 0.2vw 0 darkgray,
+    0.2vw 0.2vw 0 darkgray; 
+}
+
+a, a:hover
+{
+    text-decoration: none;
+}
+
+.image
+{
+    transform: scale(0.8);
+    width: 100%;
+    height: 100%;
+    transition: transform .3s;
+}
+
+.imageNOANIM
+{
+    transform: scale(0.8);
+    width: 100%;
+    height: 100%;
+
+    border-radius: 5%;
+    border-width: 10px;
+    border-style: ridge;
+    border-color: green;
+}
+.image:hover
+{
+    transform:scale(1);
+}
+
+#snakeboard 
+{
+    padding-top: 10%;
+    padding-bottom: 0%;
+}
+
+
+.formstyle
+{
+    width: 60%;
+    padding-left: 3%;
+}
+.formtext
+{
+    width: 100%;
+    padding: 10px;
+    font-size: 1vw;
+    justify-content: safe;
+    inline-size: 100%;
+}
+
+.submitButton
+{
+    background: #21262B;
+    transition: .2s ease-in-out;
+    font-size: 2.5vw;
+    font-weight: 600;
+    border-color:  rgba(153, 170, 181, 0.3);
+    border-width: 0.5rem;
+    border-radius: 5%;
+    box-sizing: border-box;
+    cursor: pointer;
+    background-color: rgba(88, 101, 242, 1);
+    color: #FFFFFF;
+    line-height: 1.5;
+    width: 20vw;
+    transition: transform .2s;
+}
+
+.restartButton
+{
+    background: #21262B;
+    transition: .2s ease-in-out;
+    font-size: 2.5vw;
+    font-weight: 600;
+    border-color:  rgba(153, 181, 155, 0.3);
+    border-width: 0.5rem;
+    border-radius: 5%;
+    box-sizing: border-box;
+    cursor: pointer;
+    background-color: rgb(88, 242, 121);
+    color: #FFFFFF;
+    width: 20vw;
+    transition: transform .2s;
+    color: white; 
+    font-family: 'SH Pinscher', sans-serif;            
+    text-shadow:     
+    -1px -1px 0 rgb(0, 0, 0),
+    1px -1px 0 rgb(0, 0, 0),
+    -1px 1px 0 rgb(0, 0, 0),s
+    1px 1px 0 rgb(0, 0, 0);
+}
+
+.submitButton:hover
+{
+    transform: scale(1.1);
+}
+
+#SuccessAlert
+{
+    opacity: 0;
+    transition: opacity 0.2s ;
+}
+
+#SuccessAlert.show  
+{
+    opacity: 1;
+}
+
+#SuccessAlert.hide
+{
+    opacity: 0;
+}

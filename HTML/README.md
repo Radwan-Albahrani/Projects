@@ -1,0 +1,13 @@
+# HTML Webpages
+
+In this section I will present some of the websites I have worked on using HTML, CSS, and Javascript. Currently, There are 2 websites present:
+
+## First Website
+
+My first ever website; a simple trivia about markiplier containing two questions. This website is extremely simple and only uses frontend development and very little javascript to get the trivia to work.
+
+## Homepage
+
+this is my first real website. It contains 5 different html files and 2 different javascript files. Each page contains unique designs and a very simple point to convey. The snake page, however, contains the classic snake game written from scratch and designed with the intent of fitting in with the website. You can check this website out [here](https://test.jackyxteam.repl.co/)
+
+This website has been optimized to the best of my ability to work on all devices and all resolutions (With the exception of the snake game since it requires a keyboard.)
