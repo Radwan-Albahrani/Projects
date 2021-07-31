@@ -8,6 +8,6 @@ My first ever website; a simple trivia about markiplier containing two questions
 
 ## Homepage
 
-this is my first real website. It contains 5 different html files and 2 different javascript files. Each page contains unique designs and a very simple point to convey. The snake page, however, contains the classic snake game written from scratch and designed with the intent of fitting in with the website. You can check this website out [here](https://test.jackyxteam.repl.co/)
+this is my first real website. It contains 5 different html files and 2 different javascript files. Each page contains unique designs and a very simple point to convey. The snake page, however, contains the classic snake game written from scratch and designed with the intent of fitting in with the website. You can check this website out [here](https://first-website.jackyxteam.repl.co/)
 
 This website has been optimized to the best of my ability to work on all devices and all resolutions (With the exception of the snake game since it requires a keyboard.)
