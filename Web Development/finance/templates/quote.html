@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy Stocks
+{% endblock %}
+
+{% block main %}
+    <form action="/quote" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol or Name" type="text" onfocus="this.select()" required oninvalid="setCustomValidity('Must Provide Symbol')" oninput="setCustomValidity('')">
+        </div>
+        <button class="btn btn-primary" type="submit">Look Up</button>
+    </form>
+    <br><br>
+    {% if table %}
+    
+        <table id="portfolio">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Current Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in table %}
+                <tr>
+                    <td>{{item.symbol}}</td>
+                    <td>{{item.name}}</td>
+                    <td>${{item.price}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}

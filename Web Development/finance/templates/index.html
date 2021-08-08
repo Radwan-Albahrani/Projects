@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    portfolio
+{% endblock %}
+
+{% block main %}
+    <table id="portfolio">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Shares</th>
+                <th>Price Bought</th>
+                <th>Current Price</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if table %}
+                {% for item in table %}
+                    <tr>
+                        <td>{{item.symbol}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.shares}}</td>
+                        <td>{{item.priceB}}</td>
+                        <td>{{item.priceC}}</td>
+                        <td>{{item.total}}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+
+            <tr>
+                <td>
+                    CASH
+                </td>
+                <td colspan="4"></td>
+                <td>
+                    {{cash}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5"></td>
+                <td>
+                    {{total}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

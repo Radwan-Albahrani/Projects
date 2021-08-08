@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    portfolio
+{% endblock %}
+
+{% block main %}
+{% if table %}
+    <h3>Pick the number of stocks you want to sell from the list below: </h3>
+    <form action="/sell" method="POST">
+        <table id="portfolio">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Shares</th>
+                    <th>Price Bought</th>
+                    <th>Current Price</th>
+                    <th>TOTAL</th>
+                    <th>Number of Stocks</th>
+                </tr>
+            </thead>
+            <tbody>
+                    {% for item in table %}
+                        <tr>
+                            <input type="hidden" name="TSymbol" value="{{item.symbol}}">
+                            <td>{{item.symbol}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.shares}}</td>
+                            <td>{{item.priceB}}</td>
+                            <td>{{item.priceC}}</td>
+                            <td>{{item.total}}</td>
+                            <td><input name="{{item.symbol}}" type="number" min = "0" placeholder="Enter Number here" autocomplete="off"></td>
+                        </tr>
+                    {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <button class="btn btn-primary" type="submit">Sell Now!</button>
+    </form>
+{% else %}
+<table id="portfolio">
+    <thead>
+        <tr>
+            <th>No Owned Stocks</th>
+        </tr>
+    </thead>   
+</table>
+{% endif %}
+{% endblock %}

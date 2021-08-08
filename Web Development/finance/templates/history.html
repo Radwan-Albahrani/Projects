@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    portfolio
+{% endblock %}
+
+{% block main %}
+    <table id="portfolio">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if table %}
+                {% for item in table %}
+                    <tr>
+                        <td>{{item.symbol}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.shares}}</td>
+                        <td>{{item.price}}</td>
+                        <td>{{item.date}}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="5">No History</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% if table %}
+        <ul class="pagination justify-content-center">
+            {%if table.page == 1%}
+                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+            {%else%}
+                <li class="page-item"><a class="page-link" href="/history/{{table.page-1}}">Previous</a></li>
+            {%endif%}
+            {%if table.page + 1 > length %}
+                <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+            {%else%}
+            <li class="page-item"><a class="page-link" href="{{table}}">Next</a></li>
+            {%endif%}
+        </ul>
+    {% endif %}
+{% endblock %}

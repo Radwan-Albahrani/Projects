@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy Stocks
+{% endblock %}
+
+{% block main %}
+    <form action="/buy" method="post">
+        <div class="form-group">
+            <input type="hidden" name="buy" value="search">
+            <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol or Name" type="text" value="{{symbol}}"
+            onfocus="this.select()" required oninvalid="setCustomValidity('Must Provide Symbol or Name')" oninput="setCustomValidity('')">
+        </div>
+        <button class="btn btn-primary" type="submit">Buy</button>
+    </form>
+    <br><br>
+    {% if table %}
+        <h3>Pick the Number of stocks you want to buy from the stocks below: </h3>
+        <form action="/buy" method="POST">
+            <input type="hidden" name="buy" value="buy">
+            <table id="portfolio">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Name</th>
+                        <th>Current Price</th>
+                        <th>Number of stocks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in table %}
+                    <tr>
+                        <input type="hidden" name="TSymbol" value="{{item.symbol}}">
+                        <td>{{item.symbol}}</td>
+                        <td>{{item.name}}</td>
+                        <td>${{item.price}}</td>
+                        <td><input name="{{item.symbol}}" type="number" min = "0" placeholder="Enter Number here" autocomplete="off"></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <button class="btn btn-primary" type="submit">Buy Now!</button>
+        </form>
+    {% endif %}
+
+{% endblock %}
