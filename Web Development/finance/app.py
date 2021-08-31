@@ -380,7 +380,7 @@ def sell():
     """Sell shares of stock"""
     if request.method == "GET":
         # Get user bought Stocks
-        stocks = db.execute("SELECT stock_symbol, shares, price FROM stocks WHERE user_id = ?", session["user_id"])
+        stocks = db.execute("SELECT stock_symbol, shares, price FROM stocks WHERE user_id = ? AND shares > 0", session["user_id"])
         
 
         # Prepare table
