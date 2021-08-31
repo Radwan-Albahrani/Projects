@@ -433,7 +433,7 @@ def sell():
                         total = round(float(item["priceC"]) * float(selling[item["symbol"]]), 2)
 
                         # Get the order ID
-                        orderid = db.execute("SELECT order_id FROM stocks WHERE stock_symbol = ?", item["symbol"])
+                        orderid = db.execute("SELECT order_id FROM stocks WHERE stock_symbol = ? AND user_id = ?", item["symbol"], session["user_id"])
 
                         # Update stocks and subtract the number of shares the user sold
                         db.execute("UPDATE stocks SET shares = shares - ? WHERE user_id = ? AND order_id = ?", int(selling[item["symbol"]]), session["user_id"], orderid[0]["order_id"])
@@ -470,13 +470,19 @@ def sell():
                 flash(userfeedbackfail)
 
             UserStocks = db.execute("SELECT stock_symbol, shares, price FROM stocks WHERE user_id = ? AND shares > 0", session["user_id"])
-            table = indexing(UserStocks, True)
+            if UserStocks:
+                table = indexing(UserStocks, True)
+            else:
+                table = []
 
             return render_template("sell.html", type="primary", table=table)
         else:
             flash("Please select at least 1 stock to sell")
             UserStocks = db.execute("SELECT stock_symbol, shares, price FROM stocks WHERE user_id = ? AND shares > 0", session["user_id"])
-            table = indexing(UserStocks, True)
+            if UserStocks:
+                table = indexing(UserStocks, True)
+            else:
+                table = []
             return render_template("sell.html", type="primary", table=table)
 
 
