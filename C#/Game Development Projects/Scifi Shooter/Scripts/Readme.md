@@ -49,5 +49,6 @@ This script is very simple, as the only objective it has is ensure the enemies a
 This script is responsible for determining the location an enemy will spawn, as well as increase the difficulty when needed by decreasing time per spawn and radius of spawn to a minimum of 4 and a minimum of 1 second.
 
 ## Images
+
 ![Game Image](../../../../_Images/Sci-fi%20Shooter%201.png)
 ![Game Image 2](../../../../_Images/Sci-fi%20Shooter%202.png)
