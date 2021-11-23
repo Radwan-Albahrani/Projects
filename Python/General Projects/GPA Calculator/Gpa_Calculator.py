@@ -218,6 +218,9 @@ def CalculateGPA():
             # Get credit hours from table
             credits = db.execute("SELECT credit FROM grades")
 
+            # Get number of subjects
+            subjects = get_int("Please input the number of subjects you want to test (0 if already in database): ")
+
             # Get out of loop.
             break
         
@@ -226,7 +229,10 @@ def CalculateGPA():
             # Create empty lists
             scores = []
             credits = []
-
+            # Get number of subjects
+            subjects = get_int("Please input the number of subjects you want to test: ")
+            if subjects == 0:
+                print("No Subjects Entered")
             # Get out of loop
             break
 
@@ -301,7 +307,10 @@ def CalculateGPA():
         totalhours += credit
     
     # Print current GPA
-    print(f"Calculated GPA: {round(totalpoints/totalhours, 3)}")
+    try:
+        print(f"Calculated GPA: {round(totalpoints/totalhours, 3)}")
+    except ZeroDivisionError:
+        print("No Courses Entered. Try again.")
     time.sleep(1)
 
 
