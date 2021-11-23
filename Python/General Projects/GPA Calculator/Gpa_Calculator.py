@@ -243,9 +243,6 @@ def CalculateGPA():
             
     # Prepare list to figure out raw scores.
     rawscores = []
-    
-    # Get how many subjects you want to test
-    subjects = get_int("Please input the number of subjects you want to test(0 if already in database): ")
 
     # Start a subject counter
     subjectcounter = 1
