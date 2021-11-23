@@ -139,7 +139,11 @@ def DeleteCourse():
     # If multiple courses found: 
     if len(check) > 1:
         # Print the courses found
-        print(f"Course(s) Selected: {check}. ")
+        # Connect to database
+        conn = sqlite3.connect('grades.db')
+    
+        # Print database using Pandas so its clean
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
 
         # Start a loop
         while True:
@@ -169,24 +173,27 @@ def DeleteCourse():
     # If only one course is found:
     else:
         checknew = check
-    # Select course and print it.
-    print(f"Course Selected: {checknew}")
+        # Select course and print it.
+        # Connect to database
+        conn = sqlite3.connect('grades.db')
+        # Print database using Pandas so its clean
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
 
-    # Confirm user intention to delete it
-    answer = input("Are you sure you want to delete this course? (y/n) ")
-    
-    # If confirmed, delete it and notify user
-    if answer == "y":
-        final = db.execute("DELETE FROM grades WHERE name = ?", checknew[0]["name"])
-        if final != 0:
-            print(f"{checknew} Successfully Deleted")
-            time.sleep(1)
+        # Confirm user intention to delete it
+        answer = input("Are you sure you want to delete this course? (y/n) ")
+        
+        # If confirmed, delete it and notify user
+        if answer == "y":
+            final = db.execute("DELETE FROM grades WHERE name = ?", checknew[0]["name"])
+            if final != 0:
+                print(f"{checknew} Successfully Deleted")
+                time.sleep(1)
+            else:
+                print("Error. No Course Found.")
+        # If no, Cancel action, go back to main.
         else:
-            print("Error. No Course Found.")
-    # If no, Cancel action, go back to main.
-    else:
-        print("Action Cancelled")
-        time.sleep(1)
+            print("Action Cancelled")
+            time.sleep(1)
 
 # Function to display Database
 def DisplayDatabase():
