@@ -41,7 +41,7 @@ def main():
             db = OpenDatabase()
 
             # Open New CSV file
-            with open("GPA Calculator/Grades.csv", "w", newline='') as file:
+            with open("Grades.csv", "w", newline='') as file:
                 # Connect a writer
                 writer = csv.writer(file)
                 
@@ -60,10 +60,10 @@ def main():
 def OpenDatabase():
     # First, Try to access the grades database. If it does not exist, create a new one and access it.
         try: 
-            db = SQL("sqlite:///GPA Calculator/grades.db")
+            db = SQL("sqlite:///grades.db")
         except RuntimeError:
-            open("GPA Calculator/grades.db", "w").close()
-            db = SQL("sqlite:///GPA Calculator/grades.db")
+            open("grades.db", "w").close()
+            db = SQL("sqlite:///grades.db")
         
         # Check if accessed database already has a table.
         answer = db.execute("SELECT COUNT(name) FROM sqlite_master WHERE type='table'")
@@ -72,12 +72,18 @@ def OpenDatabase():
         # If database does not have a table, create a table and fill it from the csv file
         if answer != 1:
             db.execute("CREATE TABLE grades (code TEXT, name TEXT, score NUMBER, credit NUMBER)")
+            try: 
+                with open("Grades.csv") as file:
+                    reader = csv.reader(file)
+                    row1 = next(reader)
+                    for row in reader:
+                        db.execute("INSERT INTO grades VALUES(?)", row)
 
-            with open("GPA Calculator/Grades.csv") as file:
-                reader = csv.reader(file)
-                row1 = next(reader)
-                for row in reader:
-                    db.execute("INSERT INTO grades VALUES(?)", row)
+            except FileNotFoundError:
+                # Open New CSV file
+                with open("Grades.csv", "w", newline='') as file:
+                    pass
+                        
         return db
 
 # Function to add a course to the database
@@ -185,7 +191,7 @@ def DeleteCourse():
 # Function to display Database
 def DisplayDatabase():
     # Connect to database with normal sqlite3
-    conn = sqlite3.connect('GPA Calculator/grades.db')
+    conn = sqlite3.connect('grades.db')
     
     # Print database using Pandas so its clean
     print(pd.read_sql_query("SELECT * FROM grades", conn))
