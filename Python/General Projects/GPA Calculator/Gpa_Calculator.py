@@ -9,13 +9,14 @@ import sqlite3
 def main():
     while True:
         # Ask User for response to continue.
-        print("This program will be responsible for calculating your GPA")
+        print("\n\n\nThis program will be responsible for calculating your GPA")
         print("First: Choose an option by inputting a number")
         print("1. Add New Courses.")
-        print("2. Remove Course")
-        print("3. View Current Database.")
-        print("4. Calculate expected GPA.")
-        print("5. Exit.")
+        print("2. Remove Course.")
+        print("3. Modify Course Score.")
+        print("4. View Current Database.")
+        print("5. Calculate expected GPA.")
+        print("6. Exit.")
 
         response = get_int("Choice: ")
 
@@ -26,17 +27,21 @@ def main():
         # If delete course
         elif response == 2:
             DeleteCourse()
+        
+        # If modify course
+        elif response == 3:
+            ModifyScore()
 
         #If Display current database
-        elif response == 3:
+        elif response == 4:
             DisplayDatabase()
 
         # If Calculating expected GPA
-        elif response == 4:
+        elif response == 5:
             CalculateGPA()
 
         # If exiting program.
-        elif response == 5:
+        elif response == 6:
             # Open Database
             db = OpenDatabase()
 
@@ -132,58 +137,16 @@ def DeleteCourse():
     
     # Open the database
     db = OpenDatabase()
-
-    # Check if the course name is available
-    check = db.execute("SELECT * FROM grades WHERE name LIKE ?", f"%{coursename}%")
-
-    # If multiple courses found: 
-    if len(check) > 1:
-        # Print the courses found
-        # Connect to database
-        conn = sqlite3.connect('grades.db')
     
-        # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
+    # Select the course
+    checknew = SelectCourse(coursename)
 
-        # Start a loop
-        while True:
-            # Ask user to select a course by code.
-            coursecode = input("Please Select one of the courses by typing its code: ")
-            
-            # Check if code is found, and if it is, select it and put it into a new list
-            for i in range(len(check)):
-                if coursecode == check[i]["code"]:
-                    checknew = []
-                    checknew.append(check[i])
-                    break
-            
-            # Notify User that the course is found, then exit loop.
-            if len(checknew) == 1:
-                print("Course Found.")
-                break
-
-            # if not found, tell user its not found, then loop.
-            else:
-                print("Course Not found, Try again.")
-    # If No courses were found from the query, tell user, then go back to main.
-    elif len(check) == 0:
-        print("Course Not Found.")
-        time.sleep(1)
-
-    # If only one course is found:
-    else:
-        checknew = check
-        # Select course and print it.
-        # Connect to database
-        conn = sqlite3.connect('grades.db')
-        # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
-
-        # Confirm user intention to delete it
+    # If check passed and a course was returned continue, otherwise don't.
+    if checknew != 0:
         answer = input("Are you sure you want to delete this course? (y/n) ")
         
         # If confirmed, delete it and notify user
-        if answer == "y":
+        if answer == "y" or answer == "Y":
             final = db.execute("DELETE FROM grades WHERE name = ?", checknew[0]["name"])
             if final != 0:
                 print(f"{checknew} Successfully Deleted")
@@ -194,6 +157,32 @@ def DeleteCourse():
         else:
             print("Action Cancelled")
             time.sleep(1)
+
+
+def ModifyScore():
+    # Ask User for Course name
+    coursename = input("Enter course Name: ")
+    
+    # Open the database
+    db = OpenDatabase()
+    
+    # Select the course
+    checknew = SelectCourse(coursename)
+    if checknew != 0:
+        answer = input("Is this the course you want to modify? (y/n): ")
+
+        if answer == "y" or answer == "Y":
+            newscore = input("Enter new Score: ")
+            final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newscore, checknew[0]["name"])
+            if final != 0:
+                print(f"{coursename} Successfully Updated. New score: {newscore}")
+                time.sleep(1)
+            else:
+                print("Error: No course found.")
+        else:
+            print("Action Cancelled.")
+            time.sleep(1)
+
 
 # Function to display Database
 def DisplayDatabase():
@@ -208,6 +197,9 @@ def DisplayDatabase():
 
 # Function to Calculate GPA
 def CalculateGPA():
+    # Prepare list of associations
+    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 65) : 2.50, (0, 60) : 2.00}
+
     # Start a loop to check if user wants cumulative gpa or term gpa.
     while True:
         # Ask user for input
@@ -275,25 +267,18 @@ def CalculateGPA():
         # Get current score.
         score = score["score"]
 
-        # Figure out raw score based on current score. Append appropriate raw score to table. Based on University Standards.
-        if score >= 95:
-            rawscores.append(5.00)
-        elif score >= 90:
-            rawscores.append(4.75)
-        elif score >= 85:
-            rawscores.append(4.50)
-        elif score >= 80:
-            rawscores.append(4.00)
-        elif score >= 75:
-            rawscores.append(3.50)
-        elif score >= 70:
-            rawscores.append(3.00)
-        elif score >= 65:
-            rawscores.append(2.50)
-        elif score >= 60:
-            rawscores.append(2.00)
-        else:
-            rawscores.append(0)
+        # If the score is 100, just add 5.0 to the scores and reloop
+        if score == 100:
+            rawscores.append(list(GPAconvert.values())[0])
+            continue
+        
+        # Loop through keys to determine where the grade lies. Then append the corresponding value
+        for keys, values in GPAconvert.items():
+            if score >= keys[0] and score < keys[1]:
+                rawscores.append(values)
+                break
+
+
     
     # Prepare total points and total hours for calculation
     totalpoints = 0
@@ -317,6 +302,59 @@ def CalculateGPA():
         print("No Courses Entered. Try again.")
     time.sleep(1)
 
+
+def SelectCourse(coursename):
+    #Open Database
+    db = OpenDatabase()
+    
+    # Check if the course name is available
+    check = db.execute("SELECT * FROM grades WHERE name LIKE ?", f"%{coursename}%")
+
+    # If multiple courses found: 
+    if len(check) > 1:
+        # Print the courses found
+        # Connect to database
+        conn = sqlite3.connect('grades.db')
+    
+        # Print database using Pandas so its clean
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
+
+        # Start a loop
+        while True:
+            # Ask user to select a course by code.
+            coursecode = input("Please Select one of the courses by typing its code: ")
+            
+            # Check if code is found, and if it is, select it and put it into a new list
+            for i in range(len(check)):
+                if coursecode == check[i]["code"]:
+                    checknew = []
+                    checknew.append(check[i])
+                    break
+            
+            # Notify User that the course is found, then exit loop.
+            if len(checknew) == 1:
+                print("Course Found.")
+                return checknew
+
+            # if not found, tell user its not found, then loop.
+            else:
+                print("Course Not found, Try again.")
+                return 0
+    # If No courses were found from the query, tell user, then go back to main.
+    elif len(check) == 0:
+        print("Course Not Found.")
+        time.sleep(1)
+        return 0
+
+    # If only one course is found:
+    else:
+        checknew = check
+        # Select course and print it.
+        # Connect to database
+        conn = sqlite3.connect('grades.db')
+        # Print database using Pandas so its clean
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
+        return checknew
 
 if __name__ == "__main__":
     main()
