@@ -1,9 +1,19 @@
 # Necessary Imports
 from cs50 import SQL, get_int, get_float
+import os
 import csv
 import time
 import pandas as pd
 import sqlite3
+
+# make a global Path Variable
+parent_dir = os.getenv("APPDATA")
+directory = "GPA Calculator"
+path = os.path.join(parent_dir, directory)
+try:
+    os.mkdir(path)
+except FileExistsError:
+    pass
 
 # Main Function
 def main():
@@ -46,7 +56,7 @@ def main():
             db = OpenDatabase()
 
             # Open New CSV file
-            with open("Grades.csv", "w", newline='') as file:
+            with open(path + "/Grades.csv", "w", newline='') as file:
                 # Connect a writer
                 writer = csv.writer(file)
                 
@@ -65,10 +75,10 @@ def main():
 def OpenDatabase():
     # First, Try to access the grades database. If it does not exist, create a new one and access it.
         try: 
-            db = SQL("sqlite:///grades.db")
+            db = SQL("sqlite:///" + path + "/grades.db")
         except RuntimeError:
-            open("grades.db", "w").close()
-            db = SQL("sqlite:///grades.db")
+            open(path + "/grades.db", "w").close()
+            db = SQL("sqlite:///" + path + "/grades.db")
         
         # Check if accessed database already has a table.
         answer = db.execute("SELECT COUNT(name) FROM sqlite_master WHERE type='table'")
@@ -78,7 +88,7 @@ def OpenDatabase():
         if answer != 1:
             db.execute("CREATE TABLE grades (code TEXT, name TEXT, score NUMBER, credit NUMBER)")
             try: 
-                with open("Grades.csv") as file:
+                with open(path + "/Grades.csv") as file:
                     reader = csv.reader(file)
                     row1 = next(reader)
                     for row in reader:
@@ -86,7 +96,7 @@ def OpenDatabase():
 
             except FileNotFoundError:
                 # Open New CSV file
-                with open("Grades.csv", "w", newline='') as file:
+                with open(path + "/Grades.csv", "w", newline='') as file:
                     pass
                         
         return db
@@ -187,7 +197,7 @@ def ModifyScore():
 # Function to display Database
 def DisplayDatabase():
     # Connect to database with normal sqlite3
-    conn = sqlite3.connect('grades.db')
+    conn = sqlite3.connect(path + '/grades.db')
     
     # Print database using Pandas so its clean
     print(pd.read_sql_query("SELECT * FROM grades", conn))
@@ -314,7 +324,7 @@ def SelectCourse(coursename):
     if len(check) > 1:
         # Print the courses found
         # Connect to database
-        conn = sqlite3.connect('grades.db')
+        conn = sqlite3.connect(path + '/grades.db')
     
         # Print database using Pandas so its clean
         print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
@@ -351,7 +361,7 @@ def SelectCourse(coursename):
         checknew = check
         # Select course and print it.
         # Connect to database
-        conn = sqlite3.connect('grades.db')
+        conn = sqlite3.connect(path + '/grades.db')
         # Print database using Pandas so its clean
         print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
         return checknew
