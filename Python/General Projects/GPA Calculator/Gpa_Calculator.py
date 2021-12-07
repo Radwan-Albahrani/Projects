@@ -235,6 +235,10 @@ def CalculateGPA():
     # Prepare list of associations
     GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
     GPAconvertLetters = {("A+", "a+") : 5.00 , ("A", "a") : 4.75, ("B+", "b+") : 4.50, ("B", "b") : 4.00, ("C+", "c+"): 3.50, ("C" , "c") : 3.00, ("D", "d") : 2.50, ("F", "f") : 2.00}
+    
+    # prepare total points and total hours
+    totalpoints = 0
+    totalhours = 0
 
     # Start a loop to check if user wants cumulative gpa or term gpa.
     while True:
@@ -264,6 +268,27 @@ def CalculateGPA():
             # Create empty lists
             scores = []
             credits = []
+
+            # Ask if you want to input previous GPA
+            previous = input("Do you want to input your previous GPA? (y/n): ")
+
+            # Get previous GPA data
+            while True:
+                if previous.lower() == "y":
+                    # Get previous and credit
+                    currentGPA = get_float("Enter your previous GPA: ")
+                    totalCredit = get_int("Enter your total credit hours so far: ")
+
+                    # Add to total points and total credit
+                    totalpoints = currentGPA * totalCredit
+                    totalhours += totalCredit
+                    break
+                # If no previous GPA, get out of loop.
+                elif previous.lower() == "n":
+                    break
+                else:
+                    print("Invalid input.")
+                    continue
             # Get number of subjects
             subjects = get_int("Please input the number of subjects you want to test: ")
             if subjects == 0:
@@ -336,12 +361,6 @@ def CalculateGPA():
             if score >= keys[0] and score < keys[1]:
                 rawscores.append(values)
                 break
-
-
-    
-    # Prepare total points and total hours for calculation
-    totalpoints = 0
-    totalhours = 0
 
     # Loop through as much times as there are raw scores.
     for i in range(len(rawscores)):
