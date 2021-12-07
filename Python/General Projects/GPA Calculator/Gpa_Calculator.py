@@ -243,7 +243,7 @@ def CalculateGPA():
     # Start a loop to check if user wants cumulative gpa or term gpa.
     while True:
         # Ask user for input
-        question = input("Cumulative score or term score? (1 for cumulative, 2 for term): ")
+        question = input("Cumulative score or term score? (1 for [Using Database], 2 for [Manual Input]): ")
 
         # If user wants cumulative score:
         if question == "1":
