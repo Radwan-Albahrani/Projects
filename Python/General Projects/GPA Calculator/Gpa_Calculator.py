@@ -30,46 +30,48 @@ def main():
 
         response = get_int("Choice: ")
 
-        # If add new Course
-        if response == 1:
-            AddCourse()
-        
-        # If delete course
-        elif response == 2:
-            DeleteCourse()
-        
-        # If modify course
-        elif response == 3:
-            ModifyScore()
+        # Match statement for the response
+        match response:
+            # Adding Courses
+            case 1:
+                AddCourse()
+            
+            # Deleting Courses
+            case 2:
+                DeleteCourse()
+            
+            # Modifying Scores
+            case 3:
+                ModifyScore()
+            
+            # Displaying Database
+            case 4:
+                DisplayDatabase()
+            
+            # Calculating GPA
+            case 5:
+                CalculateGPA()
+            
+            # Exiting Program
+            case 6:
+                # Open Database
+                db = OpenDatabase()
 
-        #If Display current database
-        elif response == 4:
-            DisplayDatabase()
-
-        # If Calculating expected GPA
-        elif response == 5:
-            CalculateGPA()
-
-        # If exiting program.
-        elif response == 6:
-            # Open Database
-            db = OpenDatabase()
-
-            # Open New CSV file
-            with open(path + "/Grades.csv", "w", newline='') as file:
-                # Connect a writer
-                writer = csv.writer(file)
-                
-                # Write the header
-                writer.writerow(["code", "name", "score", "credit"])
-                
-                # Select everything from database
-                data = db.execute("SELECT * FROM grades")
-                
-                # Write it into CSV file
-                for i in data:
-                    writer.writerow(i.values())
-            break
+                # Open New CSV file
+                with open(path + "/Grades.csv", "w", newline='') as file:
+                    # Connect a writer
+                    writer = csv.writer(file)
+                    
+                    # Write the header
+                    writer.writerow(["code", "name", "score", "credit"])
+                    
+                    # Select everything from database
+                    data = db.execute("SELECT * FROM grades")
+                    
+                    # Write it into CSV file
+                    for i in data:
+                        writer.writerow(i.values())
+                break
 
 # Function to open database
 def OpenDatabase():
