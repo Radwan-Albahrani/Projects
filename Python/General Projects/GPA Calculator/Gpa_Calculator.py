@@ -105,6 +105,8 @@ def OpenDatabase():
 
 # Function to add a course to the database
 def AddCourse():
+    # Course letter converter
+    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d") : 65, ("F", "f") : 0}
     # Get number of courses to add
     counter = get_int("How many courses do you want to add: ")
     
@@ -120,7 +122,28 @@ def AddCourse():
         # Get first course information (code, name, grade, and credit hours)
         coursecode = input(f"Enter Course code for course Number {courseNo}: ")
         coursename = input(f"Enter Course name for course Number {courseNo}: ")
-        coursegrade = get_float(f"Enter Grade in Percentage for course Number {courseNo}: ")
+
+        # Get grade as a letter or percentage
+        hasBeenAdded = False
+        while not hasBeenAdded:
+            try:
+                # if it passed as a percentage, let it pass
+                coursegrade = input(f"Enter Grade (letter or percentage) for course Number {courseNo}: ")
+                coursegrade = float(coursegrade)
+                hasBeenAdded = True
+                break
+            except ValueError:
+                # Convert it directly using the letters convert dictionary if it was not a percentage
+                for keys, values in GPAconvertLetters.items():
+                    if coursegrade == keys[0] or coursegrade == keys[1]:
+                        coursegrade = values
+                        hasBeenAdded = True
+                        break
+            if not hasBeenAdded:
+                print("Letter grade / Score was not accepted. Ensure it is correct")
+                continue
+
+
         coursecredit = get_float(f"Enter Credit hours for course Number {courseNo}: ")
 
         # Append course to course list to add to database later
@@ -210,7 +233,8 @@ def DisplayDatabase():
 # Function to Calculate GPA
 def CalculateGPA():
     # Prepare list of associations
-    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 65) : 2.50, (0, 60) : 2.00}
+    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
+    GPAconvertLetters = {("A+", "a+") : 5.00 , ("A", "a") : 4.75, ("B+", "b+") : 4.50, ("B", "b") : 4.00, ("C+", "c+"): 3.50, ("C" , "c") : 3.00, ("D", "d") : 2.50, ("F", "f") : 2.00}
 
     # Start a loop to check if user wants cumulative gpa or term gpa.
     while True:
@@ -262,13 +286,36 @@ def CalculateGPA():
     while subjects > 0:
         # Get credit and score from user
         currentcredit = get_int(f"Please input credit hours for subject number {subjectcounter}: ")
-        currentscore = get_int(f"Please input score for subject number {subjectcounter}: ")
+        currentscore = input(f"Please input score for subject number {subjectcounter}: ")
+        
+        # Initialize variable to check if letter grade was found
+        hasBeenAdded = False
+        
+        # Try to ensure score entered was an Integer
+        try:
+            # If it is, add it to scores and make sure hasbeenadded is true
+            currentscore = int(currentscore)
+            scores.append({'score' : int(currentscore)})
+            hasBeenAdded = True
+        # if its not an integer
+        except ValueError:
+            # Convert it directly using the letters convert dictionary and Add directly to rawscores
+            for keys, values in GPAconvertLetters.items():
+                if currentscore == keys[0] or currentscore == keys[1]:
+                    rawscores.append(values)
+                    hasBeenAdded = True
+                    break
+        
+        # If letter grade was not found, Tell user to try again
+        if not hasBeenAdded:
+            print("Letter grade not found. Try again")
+            continue
+
 
         # Increment subject counter
         subjectcounter += 1
 
         # Append score and credit to their appropriate lists 
-        scores.append({'score' : currentscore})
         credits.append({'credit' : currentcredit})
 
         # Reduce subjects by 1.
