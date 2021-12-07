@@ -120,31 +120,26 @@ def AddCourse():
     while counter > 0:
         
         # Get first course information (code, name, grade, and credit hours)
-        coursecode = input(f"Enter Course code for course Number {courseNo}: ")
-        coursename = input(f"Enter Course name for course Number {courseNo}: ")
+        coursecode = input(f"Enter Course [code] for course Number {courseNo}: ")
+        coursename = input(f"Enter Course [name] for course Number {courseNo}: ")
 
-        # Get grade as a letter or percentage
-        hasBeenAdded = False
-        while not hasBeenAdded:
-            try:
-                # if it passed as a percentage, let it pass
-                coursegrade = input(f"Enter Grade (letter or percentage) for course Number {courseNo}: ")
-                coursegrade = float(coursegrade)
-                hasBeenAdded = True
-                break
-            except ValueError:
-                # Convert it directly using the letters convert dictionary if it was not a percentage
-                for keys, values in GPAconvertLetters.items():
-                    if coursegrade == keys[0] or coursegrade == keys[1]:
-                        coursegrade = values
-                        hasBeenAdded = True
-                        break
-            if not hasBeenAdded:
-                print("Letter grade / Score was not accepted. Ensure it is correct")
+        # Loop
+        while True:
+            # Ask user for grade
+            coursegrade = input(f"Enter Course [grade] in (Letter or percentage) for course number {courseNo}: ")
+            
+            # Validate grade with function
+            coursegrade = GetScore(coursegrade)
+
+            # if invalidated, keep looping. Else break.
+            if coursegrade == -1:
+                print("Grade entered is invalid, try again.")
                 continue
+            else:
+                break
 
 
-        coursecredit = get_float(f"Enter Credit hours for course Number {courseNo}: ")
+        coursecredit = get_float(f"Enter [Credit hours] for course Number {courseNo}: ")
 
         # Append course to course list to add to database later
         courselist.append([coursecode, coursename, coursegrade, coursecredit])
@@ -202,13 +197,31 @@ def ModifyScore():
     db = OpenDatabase()
     
     # Select the course
-    checknew = SelectCourse(coursename)
-    if checknew != 0:
-        answer = input("Is this the course you want to modify? (y/n): ")
+    selectedCourse = SelectCourse(coursename)
+    if selectedCourse != 0:
 
-        if answer == "y" or answer == "Y":
-            newscore = input("Enter new Score: ")
-            final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newscore, checknew[0]["name"])
+        # Check with the user if the correct course has been selected
+        answer = input("Is this the course you want to modify? (y/n): ")
+        # If it is
+        if answer.lower() == "y":
+            # Check if score was received from the function
+
+            # While it has not been received
+            while True:
+                # Get a score from the user
+                newscore = input("Enter new score in letter or percentage: ")
+                
+                # Get the accurate score from the function
+                newscore = GetScore(newscore)
+
+                # If score found, add it to database and exit loop
+                if newscore == -1:
+                    print("Score invalid, Try again.")
+                    continue
+                else:
+                    break
+            # Once score is correct, update database if possible
+            final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newscore, selectedCourse[0]["name"])
             if final != 0:
                 print(f"{coursename} Successfully Updated. New score: {newscore}")
                 time.sleep(1)
@@ -234,7 +247,6 @@ def DisplayDatabase():
 def CalculateGPA():
     # Prepare list of associations
     GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
-    GPAconvertLetters = {("A+", "a+") : 5.00 , ("A", "a") : 4.75, ("B+", "b+") : 4.50, ("B", "b") : 4.00, ("C+", "c+"): 3.50, ("C" , "c") : 3.00, ("D", "d") : 2.50, ("F", "f") : 2.00}
     
     # prepare total points and total hours
     totalpoints = 0
@@ -311,36 +323,28 @@ def CalculateGPA():
     while subjects > 0:
         # Get credit and score from user
         currentcredit = get_int(f"Please input credit hours for subject number {subjectcounter}: ")
-        currentscore = input(f"Please input score for subject number {subjectcounter}: ")
         
-        # Initialize variable to check if letter grade was found
-        hasBeenAdded = False
-        
-        # Try to ensure score entered was an Integer
-        try:
-            # If it is, add it to scores and make sure hasbeenadded is true
-            currentscore = int(currentscore)
-            scores.append({'score' : int(currentscore)})
-            hasBeenAdded = True
-        # if its not an integer
-        except ValueError:
-            # Convert it directly using the letters convert dictionary and Add directly to rawscores
-            for keys, values in GPAconvertLetters.items():
-                if currentscore == keys[0] or currentscore == keys[1]:
-                    rawscores.append(values)
-                    hasBeenAdded = True
+        # loop
+        while True:
+                # Get a score from the user
+                currentscore = input(f"Please input score for subject number {subjectcounter}: ")
+                
+                # Get the accurate score from the function
+                currentscore = GetScore(currentscore)
+
+                # If score found, add it to database and exit loop
+                if currentscore == -1:
+                    print("Score invalid, Try again.")
+                    continue
+                else:
                     break
-        
-        # If letter grade was not found, Tell user to try again
-        if not hasBeenAdded:
-            print("Letter grade not found. Try again")
-            continue
 
 
         # Increment subject counter
         subjectcounter += 1
 
-        # Append score and credit to their appropriate lists 
+        # Append score and credit to their appropriate lists
+        scores.append({'score' : currentscore}) 
         credits.append({'credit' : currentcredit})
 
         # Reduce subjects by 1.
@@ -433,6 +437,27 @@ def SelectCourse(coursename):
         # Print database using Pandas so its clean
         print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
         return checknew
+
+def GetScore(score):
+    # Dictionary to convert score
+    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d") : 65, ("F", "f") : 0}
+    
+    try:
+        # if it passed as a percentage, check it, then return it
+        score = float(score)
+        # If score is not within score limits, return error code
+        if score > 100 or score < 0:
+            return -1
+        return score
+    except ValueError:
+        # Convert it directly using the letters convert dictionary if it was not a percentage
+        for keys, values in GPAconvertLetters.items():
+            if score == keys[0] or score == keys[1]:
+                score = values
+                return score
+    
+    # if nothing has been returned thus far, return -1
+    return -1
 
 if __name__ == "__main__":
     main()
