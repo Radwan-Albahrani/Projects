@@ -7,7 +7,7 @@ import pandas as pd
 import sqlite3
 import requests
 import logging
-
+import sys
 
 # Disable requests logging
 urllib3_log = logging.getLogger("urllib3")
@@ -25,7 +25,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Added AutoUpdate Function"
+    updatemessage = "Fixed Slight Error When Updating"
     checkForUpdate(updatemessage)
 
     while True:
@@ -504,14 +504,13 @@ def checkForUpdate(currentMessage):
                 with open("New/GPA_Calculator.exe", 'wb') as file:
                     file.write(download.content)
                 # Tell User the file has been downloaded.
-                print("File has been downloaded in \"New\" Directory. Please Use it to replace this current program.")
-                time.sleep(1)
-                exit()
+                print("File has been downloaded in \"New\" Directory. Please Use it to replace this current program. This program will close in 5 seconds.")
+                time.sleep(5)
+                sys.exit()
             # Print out any error that occurs.
             except Exception as e:
                 print("Hmm. An error has occurred. Maybe check your internet? \n\n")
                 print("Error Message: \n" + str(e))
-            
 
 
 if __name__ == "__main__":
