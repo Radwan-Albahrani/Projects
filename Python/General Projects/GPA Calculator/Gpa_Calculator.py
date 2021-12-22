@@ -5,6 +5,13 @@ import csv
 import time
 import pandas as pd
 import sqlite3
+import requests
+import logging
+
+
+# Disable requests logging
+urllib3_log = logging.getLogger("urllib3")
+urllib3_log.setLevel(logging.CRITICAL)
 
 # make a global Path Variable
 parent_dir = os.getenv("APPDATA")
@@ -17,6 +24,10 @@ except FileExistsError:
 
 # Main Function
 def main():
+    # Check if an update is available
+    updatemessage = "Added AutoUpdate Function"
+    checkForUpdate(updatemessage)
+
     while True:
         # Ask User for response to continue.
         print("\n\n\nThis program will be responsible for calculating your GPA")
@@ -412,6 +423,10 @@ def SelectCourse(coursename):
                     checknew = []
                     checknew.append(check[i])
                     break
+                else:
+                    print("Course not found. Try again.")
+                    time.sleep(1)
+                    return 0
             
             # Notify User that the course is found, then exit loop.
             if len(checknew) == 1:
@@ -458,6 +473,46 @@ def GetScore(score):
     
     # if nothing has been returned thus far, return -1
     return -1
+
+
+
+def checkForUpdate(currentMessage):
+    # Try to get the latest commit and compare the names. Else. Tell the user something is wrong with the internet
+    try:
+        response = requests.get('https://api.github.com/repos/JackyXteam/Projects/commits?%20Python%2FGeneral%20Projects%2FGPA%20Calculator&page=1&per_page=1').json()
+        newMessage = response[0]['commit']['message']
+    except Exception as e:
+        print("Something went wrong with the update checker. Check your internet connection.")
+        return 0
+
+
+    # Check if the commit message matches the coded in message.
+    if currentMessage == newMessage:
+        print("You are on the latest version!")
+
+    # If it doesn't match, ask if the user wants to update
+    else:
+        # Get input from user to check if they want to update
+        update = input("New Version has been found. Do you want to install the new version? (y/n): ")
+
+        # If they do, get the new file
+        if update.lower() == "y":
+            # Try to get the new file and download it
+            try:
+                download = requests.get("https://github.com/JackyXteam/Projects/blob/master/Python/General%20Projects/GPA%20Calculator/Gpa_Calculator.exe?raw=true")
+                os.mkdir("New")
+                with open("New/GPA_Calculator.exe", 'wb') as file:
+                    file.write(download.content)
+                # Tell User the file has been downloaded.
+                print("File has been downloaded in \"New\" Directory. Please Use it to replace this current program.")
+                time.sleep(1)
+                exit()
+            # Print out any error that occurs.
+            except Exception as e:
+                print("Hmm. An error has occurred. Maybe check your internet? \n\n")
+                print("Error Message: \n" + str(e))
+            
+
 
 if __name__ == "__main__":
     main()
