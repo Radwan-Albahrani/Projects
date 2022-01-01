@@ -25,7 +25,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Fixed Slight Error When Updating"
+    updatemessage = "Fixed Error When Selecting Multiple courses."
     checkForUpdate(updatemessage)
 
     while True:
@@ -419,18 +419,14 @@ def SelectCourse(coursename):
             
             # Check if code is found, and if it is, select it and put it into a new list
             for i in range(len(check)):
-                if coursecode == check[i]["code"]:
+                if coursecode in check[i]["code"]:
                     checknew = []
                     checknew.append(check[i])
                     break
-                else:
-                    print("Course not found. Try again.")
-                    time.sleep(1)
-                    return 0
             
             # Notify User that the course is found, then exit loop.
             if len(checknew) == 1:
-                print("Course Found.")
+                print("\n\nCourse Found: \n" + str(pd.DataFrame(checknew)))
                 return checknew
 
             # if not found, tell user its not found, then loop.
