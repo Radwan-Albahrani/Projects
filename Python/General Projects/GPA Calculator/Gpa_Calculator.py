@@ -25,7 +25,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Fixed Error When Selecting Multiple courses."
+    updatemessage = "Fixed Error: Wrong code when selecting courses"
     checkForUpdate(updatemessage)
 
     while True:
@@ -419,10 +419,12 @@ def SelectCourse(coursename):
             
             # Check if code is found, and if it is, select it and put it into a new list
             for i in range(len(check)):
-                if coursecode in check[i]["code"]:
+                if coursecode.upper() in check[i]["code"]:
                     checknew = []
                     checknew.append(check[i])
                     break
+                else:
+                    checknew = []
             
             # Notify User that the course is found, then exit loop.
             if len(checknew) == 1:
@@ -432,6 +434,7 @@ def SelectCourse(coursename):
             # if not found, tell user its not found, then loop.
             else:
                 print("Course Not found, Try again.")
+                time.sleep(2)
                 return 0
     # If No courses were found from the query, tell user, then go back to main.
     elif len(check) == 0:
