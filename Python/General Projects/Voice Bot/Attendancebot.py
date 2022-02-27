@@ -5,10 +5,14 @@ import random
 from pynput.keyboard import Key, Controller
 from pycaw.pycaw import AudioUtilities
 
+# Indication that it started listening
+print("Started.")
+
 # Instantiating recognizer as r.
 r = sr.Recognizer()
 
 while True:
+    
     with sr.Microphone() as source:
 
         # Ask user to speak and get what he says in Audio
