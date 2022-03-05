@@ -25,7 +25,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Fixed Error: Wrong code when selecting courses"
+    updatemessage = "Fixed Update Function to get correct Commit"
     checkForUpdate(updatemessage)
 
     while True:
@@ -478,7 +478,7 @@ def GetScore(score):
 def checkForUpdate(currentMessage):
     # Try to get the latest commit and compare the names. Else. Tell the user something is wrong with the internet
     try:
-        response = requests.get('https://api.github.com/repos/JackyXteam/Projects/commits?%20Python%2FGeneral%20Projects%2FGPA%20Calculator&page=1&per_page=1').json()
+        response = requests.get('https://api.github.com/repos/JackyXteam/Projects/commits?path=Python/General%20Projects/GPA%20Calculator&%20&page=1&per_page=1').json()
         newMessage = response[0]['commit']['message']
     except Exception as e:
         print("Something went wrong with the update checker. Check your internet connection.")
