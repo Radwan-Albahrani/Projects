@@ -25,7 +25,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Fixed Update Function to get correct Commit"
+    updatemessage = "Optimized Code"
     checkForUpdate(updatemessage)
 
     while True:
@@ -65,23 +65,7 @@ def main():
             
             # Exiting Program
             case 6:
-                # Open Database
-                db = OpenDatabase()
-
-                # Open New CSV file
-                with open(path + "/Grades.csv", "w", newline='') as file:
-                    # Connect a writer
-                    writer = csv.writer(file)
-                    
-                    # Write the header
-                    writer.writerow(["code", "name", "score", "credit"])
-                    
-                    # Select everything from database
-                    data = db.execute("SELECT * FROM grades")
-                    
-                    # Write it into CSV file
-                    for i in data:
-                        writer.writerow(i.values())
+                exitRoutine()
                 break
 
 # Function to open database
@@ -116,8 +100,6 @@ def OpenDatabase():
 
 # Function to add a course to the database
 def AddCourse():
-    # Course letter converter
-    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d") : 65, ("F", "f") : 0}
     # Get number of courses to add
     counter = get_int("How many courses do you want to add: ")
     
@@ -199,7 +181,7 @@ def DeleteCourse():
             print("Action Cancelled")
             time.sleep(1)
 
-
+# Function to Modify score of inputted data in database
 def ModifyScore():
     # Ask User for Course name
     coursename = input("Enter course Name: ")
@@ -241,7 +223,6 @@ def ModifyScore():
         else:
             print("Action Cancelled.")
             time.sleep(1)
-
 
 # Function to display Database
 def DisplayDatabase():
@@ -395,7 +376,7 @@ def CalculateGPA():
         print("No Courses Entered. Try again.")
     time.sleep(1)
 
-
+# Function to select specific course from database
 def SelectCourse(coursename):
     #Open Database
     db = OpenDatabase()
@@ -452,6 +433,7 @@ def SelectCourse(coursename):
         print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
         return checknew
 
+# Function to check and convert score based on if its a letter or a percentage
 def GetScore(score):
     # Dictionary to convert score
     GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d") : 65, ("F", "f") : 0}
@@ -473,8 +455,27 @@ def GetScore(score):
     # if nothing has been returned thus far, return -1
     return -1
 
+# Exit Routine
+def exitRoutine():
+    # Open Database
+    db = OpenDatabase()
 
+    # Open New CSV file
+    with open(path + "/Grades.csv", "w", newline='') as file:
+        # Connect a writer
+        writer = csv.writer(file)
+        
+        # Write the header
+        writer.writerow(["code", "name", "score", "credit"])
+        
+        # Select everything from database
+        data = db.execute("SELECT * FROM grades")
+        
+        # Write it into CSV file
+        for i in data:
+            writer.writerow(i.values())
 
+# Function to Check for update
 def checkForUpdate(currentMessage):
     # Try to get the latest commit and compare the names. Else. Tell the user something is wrong with the internet
     try:
