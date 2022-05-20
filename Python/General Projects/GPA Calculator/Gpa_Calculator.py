@@ -25,8 +25,8 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updatemessage = "Optimized Code"
-    checkForUpdate(updatemessage)
+    updateMessage = "Can Modify Course + Code Snake Case"
+    checkForUpdate(updateMessage)
 
     while True:
         # Ask User for response to continue.
@@ -34,7 +34,7 @@ def main():
         print("First: Choose an option by inputting a number")
         print("1. Add New Courses.")
         print("2. Remove Course.")
-        print("3. Modify Course Score.")
+        print("3. Modify Course.")
         print("4. View Current Database.")
         print("5. Calculate expected GPA.")
         print("6. Exit.")
@@ -53,7 +53,7 @@ def main():
             
             # Modifying Scores
             case 3:
-                ModifyScore()
+                ModifyCourse()
             
             # Displaying Database
             case 4:
@@ -104,7 +104,7 @@ def AddCourse():
     counter = get_int("How many courses do you want to add: ")
     
     # Prepare a list of courses
-    courselist = []
+    courseList = []
     
     # Start with first course.
     courseNo = 1
@@ -113,29 +113,29 @@ def AddCourse():
     while counter > 0:
         
         # Get first course information (code, name, grade, and credit hours)
-        coursecode = input(f"Enter Course [code] for course Number {courseNo}: ")
-        coursename = input(f"Enter Course [name] for course Number {courseNo}: ")
+        courseCode = input(f"Enter Course [code] for course Number {courseNo}: ").upper()
+        courseName = input(f"Enter Course [name] for course Number {courseNo}: ")
 
         # Loop
         while True:
             # Ask user for grade
-            coursegrade = input(f"Enter Course [grade] in (Letter or percentage) for course number {courseNo}: ")
+            courseGrade = input(f"Enter Course [grade] in (Letter or percentage) for course number {courseNo}: ")
             
             # Validate grade with function
-            coursegrade = GetScore(coursegrade)
+            courseGrade = GetScore(courseGrade)
 
             # if invalidated, keep looping. Else break.
-            if coursegrade == -1:
+            if courseGrade == -1:
                 print("Grade entered is invalid, try again.")
                 continue
             else:
                 break
 
 
-        coursecredit = get_float(f"Enter [Credit hours] for course Number {courseNo}: ")
+        courseCredit = get_float(f"Enter [Credit hours] for course Number {courseNo}: ")
 
         # Append course to course list to add to database later
-        courselist.append([coursecode, coursename, coursegrade, coursecredit])
+        courseList.append([courseCode, courseName, courseGrade, courseCredit])
 
         # Do necessary increment and decrement for loop.
         courseNo += 1
@@ -145,9 +145,9 @@ def AddCourse():
     db = OpenDatabase()
 
     # Add courses to database from the course list.
-    for i in range(len(courselist)):
-        print(f"Adding course: {courselist[i]}")
-        db.execute("INSERT INTO grades VALUES(?)", courselist[i])
+    for i in range(len(courseList)):
+        print(f"Adding course: {courseList[i]}")
+        db.execute("INSERT INTO grades VALUES(?)", courseList[i])
     
     # Notify User after done.
     print("All Courses Added Successfully.")
@@ -156,23 +156,23 @@ def AddCourse():
 # Function to remove a course from the database
 def DeleteCourse():
     # Ask User for Course name
-    coursename = input("Enter course Name: ")
+    courseName = input("Enter course Name: ")
     
     # Open the database
     db = OpenDatabase()
     
     # Select the course
-    checknew = SelectCourse(coursename)
+    checkNew = SelectCourse(courseName)
 
     # If check passed and a course was returned continue, otherwise don't.
-    if checknew != 0:
+    if checkNew != 0:
         answer = input("Are you sure you want to delete this course? (y/n) ")
         
         # If confirmed, delete it and notify user
         if answer == "y" or answer == "Y":
-            final = db.execute("DELETE FROM grades WHERE name = ?", checknew[0]["name"])
+            final = db.execute("DELETE FROM grades WHERE name = ?", checkNew[0]["name"])
             if final != 0:
-                print(f"{checknew} Successfully Deleted")
+                print(f"{checkNew} Successfully Deleted")
                 time.sleep(1)
             else:
                 print("Error. No Course Found.")
@@ -182,58 +182,152 @@ def DeleteCourse():
             time.sleep(1)
 
 # Function to Modify score of inputted data in database
-def ModifyScore():
+def ModifyCourse():
     # Ask User for Course name
-    coursename = input("Enter course Name: ")
+    courseName = input("Enter course Name: ")
     
     # Open the database
     db = OpenDatabase()
     
     # Select the course
-    selectedCourse = SelectCourse(coursename)
+    selectedCourse = SelectCourse(courseName)
     if selectedCourse != 0:
-
         # Check with the user if the correct course has been selected
         answer = input("Is this the course you want to modify? (y/n): ")
+        
         # If it is
         if answer.lower() == "y":
-            # Check if score was received from the function
-
-            # While it has not been received
             while True:
-                # Get a score from the user
-                newscore = input("Enter new score in letter or percentage: ")
-                
-                # Get the accurate score from the function
-                newscore = GetScore(newscore)
+                CourseInformation = pd.Series(selectedCourse[0])
+                print("\n" + str(pd.DataFrame(CourseInformation).transpose()) + "\n\n")
+                # Present New Menu
+                print("1. Modify Course Code.")
+                print("2. Modify Name.")
+                print("3. Modify Score.")
+                print("4. Modify Credit Hours.")
+                print("5. Back to Main Menu.")
 
-                # If score found, add it to database and exit loop
-                if newscore == -1:
-                    print("Score invalid, Try again.")
-                    continue
-                else:
-                    break
-            # Once score is correct, update database if possible
-            final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newscore, selectedCourse[0]["name"])
-            if final != 0:
-                print(f"{coursename} Successfully Updated. New score: {newscore}")
-                time.sleep(1)
-            else:
-                print("Error: No course found.")
+                response = get_int("Choice: ")
+
+                match response:
+                    # This case to modify the code of the course
+                    case 1:
+                        # Get the code and make sure its upper case
+                        newCode = input("Enter New Course Code: ").upper()
+
+                        # Try to add it to database
+                        final = db.execute("UPDATE grades SET code = ? WHERE name = ?", newCode, selectedCourse[0]["name"])
+
+                        # If modified successfully, inform user.
+                        if final != 0:
+                            print(f"{courseName} Successfully Updated. New Code: {newCode}")
+                            selectedCourse[0]["code"] = newCode
+                            time.sleep(1)
+                        else:
+                            print("Error: No course found.")
+                    # This case to modify the name of the course
+                    case 2:
+                        # Get the name from the user
+                        newName = input("Enter New Course Name: ")
+
+                        # Try to add it to database
+                        final = db.execute("UPDATE grades SET name = ? WHERE name = ?", newName, selectedCourse[0]["name"])
+                        
+                        # If modified successfully, inform user.
+                        if final != 0:
+                            print(f"{courseName} Successfully Updated. New Name: {newName}")
+                            selectedCourse[0]["name"] = newName
+                            time.sleep(1)
+                        else:
+                            print("Error: No course found.")
+                    # This case to modify the score of the course
+                    case 3:
+                        # While it has not been received
+                        while True:
+                            # Get a score from the user
+                            newScore = input("Enter new score in letter or percentage: ")
+                            
+                            # Get the accurate score from the function
+                            newScore = GetScore(newScore)
+
+                            # If score found, add it to database and exit loop
+                            if newScore == -1:
+                                print("Score invalid, Try again.")
+                                continue
+                            else:
+                                break
+                        
+                        # Once score is correct, update database if possible
+                        final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newScore, selectedCourse[0]["name"])
+                        if final != 0:
+                            print(f"{courseName} Successfully Updated. New score: {newScore}")
+                            selectedCourse[0]["score"] = newScore
+                            time.sleep(1)
+                        else:
+                            print("Error: No course found.")
+                    # This case to modify the credit of the course
+                    case 4:
+                        # Get the new Credit
+                        newCredit = get_int("Enter New Course Credit: ")
+                        
+                        # Try to add it to database
+                        final = db.execute("UPDATE grades SET credit = ? WHERE name = ?", newCredit, selectedCourse[0]["name"])
+                        
+                        # If modified successfully, inform user.
+                        if final != 0:
+                            print(f"{courseName} Successfully Updated. New Credit: {newCredit}")
+                            selectedCourse[0]["credit"] = newCredit
+                            time.sleep(1)
+                        else:
+                            print("Error: No course found.")
+                    case 5:
+                        break
         else:
             print("Action Cancelled.")
             time.sleep(1)
+                
 
 # Function to display Database
 def DisplayDatabase():
     # Connect to database with normal sqlite3
     conn = sqlite3.connect(path + '/grades.db')
     
-    # Print database using Pandas so its clean
-    print(pd.read_sql_query("SELECT * FROM grades", conn))
+    # Store Database into dataFrame
+    df = pd.read_sql_query("SELECT * FROM grades", conn)
+    
+    # Change score to letter grade
+    df = ChangeScores(df)
+
+    # Print out dataFrame
+    print(df)
 
     # Sleep for a bit so user can view.
     time.sleep(5)
+
+# change the scores of a dataFrame
+def ChangeScores(df:pd.DataFrame):
+    # Dictionary to convert to letters
+    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A", (85, 90) : "B+", (80, 85) : "B", (75, 80): "C+", (70 , 75) : "C", (60, 70) : "D", (0, 60) : "F"}
+
+    # Loop over the DataFrame
+    for index, row in df.iterrows():
+        # Get the score
+        score = row["score"]
+        # IF score is 100, A+ and next loop
+        if score == 100:
+            df.loc[index, "score"] = "A+"
+            continue
+
+        # Loop through keys to determine where the grade lies. Then append the corresponding Letter grade
+        for keys, values in GPAconvert.items():
+            if score >= keys[0] and score < keys[1]:
+                if len(values) == 2:
+                    df.loc[index, "score"] = values
+                else:
+                    df.loc[index, "score"] = values + " "
+                break
+    # Return the modified DataFrame
+    return df
 
 # Function to Calculate GPA
 def CalculateGPA():
@@ -241,8 +335,8 @@ def CalculateGPA():
     GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
     
     # prepare total points and total hours
-    totalpoints = 0
-    totalhours = 0
+    totalPoints = 0
+    totalHours = 0
 
     # Start a loop to check if user wants cumulative gpa or term gpa.
     while True:
@@ -284,8 +378,8 @@ def CalculateGPA():
                     totalCredit = get_int("Enter your total credit hours so far: ")
 
                     # Add to total points and total credit
-                    totalpoints = currentGPA * totalCredit
-                    totalhours += totalCredit
+                    totalPoints = currentGPA * totalCredit
+                    totalHours += totalCredit
                     break
                 # If no previous GPA, get out of loop.
                 elif previous.lower() == "n":
@@ -306,26 +400,26 @@ def CalculateGPA():
             print("Choice in valid, try again.")
             
     # Prepare list to figure out raw scores.
-    rawscores = []
+    rawScores = []
 
     # Start a subject counter
-    subjectcounter = 1
+    subjectCounter = 1
 
     # While not done with subjects
     while subjects > 0:
         # Get credit and score from user
-        currentcredit = get_int(f"Please input credit hours for subject number {subjectcounter}: ")
+        currentCredit = get_int(f"Please input credit hours for subject number {subjectCounter}: ")
         
         # loop
         while True:
                 # Get a score from the user
-                currentscore = input(f"Please input score for subject number {subjectcounter}: ")
+                currentScore = input(f"Please input score for subject number {subjectCounter}: ")
                 
                 # Get the accurate score from the function
-                currentscore = GetScore(currentscore)
+                currentScore = GetScore(currentScore)
 
                 # If score found, add it to database and exit loop
-                if currentscore == -1:
+                if currentScore == -1:
                     print("Score invalid, Try again.")
                     continue
                 else:
@@ -333,11 +427,11 @@ def CalculateGPA():
 
 
         # Increment subject counter
-        subjectcounter += 1
+        subjectCounter += 1
 
         # Append score and credit to their appropriate lists
-        scores.append({'score' : currentscore}) 
-        credits.append({'credit' : currentcredit})
+        scores.append({'score' : currentScore}) 
+        credits.append({'credit' : currentCredit})
 
         # Reduce subjects by 1.
         subjects -= 1
@@ -349,40 +443,40 @@ def CalculateGPA():
 
         # If the score is 100, just add 5.0 to the scores and reloop
         if score == 100:
-            rawscores.append(list(GPAconvert.values())[0])
+            rawScores.append(list(GPAconvert.values())[0])
             continue
         
         # Loop through keys to determine where the grade lies. Then append the corresponding value
         for keys, values in GPAconvert.items():
             if score >= keys[0] and score < keys[1]:
-                rawscores.append(values)
+                rawScores.append(values)
                 break
 
     # Loop through as much times as there are raw scores.
-    for i in range(len(rawscores)):
+    for i in range(len(rawScores)):
         # Get appropriate credit hour for raw score
         credit = credits[i]["credit"]
         
         # Calculate points and add it to total points
-        totalpoints += rawscores[i] * credit
+        totalPoints += rawScores[i] * credit
 
         # Add credit hours to total hours.
-        totalhours += credit
+        totalHours += credit
     
     # Print current GPA
     try:
-        print(f"Calculated GPA: {round(totalpoints/totalhours, 3)}")
+        print(f"Calculated GPA: {round(totalPoints/totalHours, 3)}")
     except ZeroDivisionError:
         print("No Courses Entered. Try again.")
     time.sleep(1)
 
 # Function to select specific course from database
-def SelectCourse(coursename):
+def SelectCourse(courseName):
     #Open Database
     db = OpenDatabase()
     
     # Check if the course name is available
-    check = db.execute("SELECT * FROM grades WHERE name LIKE ?", f"%{coursename}%")
+    check = db.execute("SELECT * FROM grades WHERE name LIKE ?", f"%{courseName}%")
 
     # If multiple courses found: 
     if len(check) > 1:
@@ -391,26 +485,26 @@ def SelectCourse(coursename):
         conn = sqlite3.connect(path + '/grades.db')
     
         # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
 
         # Start a loop
         while True:
             # Ask user to select a course by code.
-            coursecode = input("Please Select one of the courses by typing its code: ")
+            courseCode = input("Please Select one of the courses by typing its code: ")
             
             # Check if code is found, and if it is, select it and put it into a new list
             for i in range(len(check)):
-                if coursecode.upper() in check[i]["code"]:
-                    checknew = []
-                    checknew.append(check[i])
+                if courseCode.upper() in check[i]["code"]:
+                    checkNew = []
+                    checkNew.append(check[i])
                     break
                 else:
-                    checknew = []
+                    checkNew = []
             
             # Notify User that the course is found, then exit loop.
-            if len(checknew) == 1:
-                print("\n\nCourse Found: \n" + str(pd.DataFrame(checknew)))
-                return checknew
+            if len(checkNew) == 1:
+                print("\n\nCourse Found: \n" + str(pd.DataFrame(checkNew)))
+                return checkNew
 
             # if not found, tell user its not found, then loop.
             else:
@@ -425,13 +519,13 @@ def SelectCourse(coursename):
 
     # If only one course is found:
     else:
-        checknew = check
+        checkNew = check
         # Select course and print it.
         # Connect to database
         conn = sqlite3.connect(path + '/grades.db')
         # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{coursename}%'", conn)))
-        return checknew
+        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
+        return checkNew
 
 # Function to check and convert score based on if its a letter or a percentage
 def GetScore(score):
