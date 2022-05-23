@@ -24,37 +24,9 @@ int main(int argc, char const *argv[])
         }
     }
 
-    // Start a counter for number of moves
-    int counter = 0;
-
-    // Start calculating number of moves to get the 1 to postion 2,2
-    while(row != 2 || column != 2)
-    {
-        if(row > 2)
-        {
-            row--;
-            counter++;
-        }
-        else if(row == 2);
-        else
-        {
-            row++;
-            counter++;
-        }
-
-        if(column > 2)
-        {
-            column--;
-            counter++;
-        }
-        else if(column == 2);
-        else
-        {
-            column++;
-            counter++;
-        }
-    }
-
+    // Get the number of moves
+    int counter = abs(row - 2) + abs(column - 2);
+    
     // Print out that number
     cout << counter;
     return 0;
