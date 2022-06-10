@@ -1,4 +1,5 @@
 # Necessary Imports
+from turtle import getscreen
 from cs50 import SQL, get_int, get_float
 import os
 import csv
@@ -8,6 +9,8 @@ import sqlite3
 import requests
 import logging
 import sys
+from bs4 import BeautifulSoup
+from pwinput import pwinput
 
 # Disable requests logging
 urllib3_log = logging.getLogger("urllib3")
@@ -25,7 +28,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Can Modify Course + Code Snake Case"
+    updateMessage = "Can Get Data from IAU"
     checkForUpdate(updateMessage)
 
     while True:
@@ -37,7 +40,8 @@ def main():
         print("3. Modify Course.")
         print("4. View Current Database.")
         print("5. Calculate expected GPA.")
-        print("6. Exit.")
+        print("6. Get Data from SIS website.")
+        print("7. Exit.")
 
         response = get_int("Choice: ")
 
@@ -63,8 +67,10 @@ def main():
             case 5:
                 CalculateGPA()
             
-            # Exiting Program
             case 6:
+                DataExtractor()
+            # Exiting Program
+            case 7:
                 exitRoutine()
                 break
 
@@ -289,6 +295,9 @@ def ModifyCourse():
 
 # Function to display Database
 def DisplayDatabase():
+    # Open Database to make sure its created Properly
+    OpenDatabase()
+    
     # Connect to database with normal sqlite3
     conn = sqlite3.connect(path + '/grades.db')
     
@@ -605,6 +614,73 @@ def checkForUpdate(currentMessage):
             except Exception as e:
                 print("Hmm. An error has occurred. Maybe check your internet? \n\n")
                 print("Error Message: \n" + str(e))
+
+# Function to get Data from IAU Website
+def DataExtractor():
+    # Needed URLs
+    loginUrl = "https://sis.iau.edu.sa/psp/hcs9prd/EMPLOYEE/SA/?&cmd=login&languageCd=ENG"
+    returnURl = "https://sis.iau.edu.sa/psc/hcs9prd_60/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_CRSE_HIST_FL.GBL"
+
+    # Get Username and Password From User:
+    username = input("Enter your Username: ")
+    password = pwinput(prompt="Enter your Password: ")
+
+    # Prepare login Form Data
+    formData = { 
+        "userid": username,
+        "pwd": password
+    }
+
+    # Send in request and get to appropriate page for grades
+    with requests.session() as s:
+        s.post(loginUrl, data=formData)
+        r = s.get(returnURl)
+        f = BeautifulSoup(r.content, "html.parser")
+        if "Oracle PeopleSoft" in f.prettify():
+            print("Login Failed. Ensure you have the correct Username and Password.")
+            return -1
+
+    # Remove any HTML
+    text = f.getText()
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+
+    # Create a list from the text
+    gradesList = list(text.split("\n"))
+
+    # Remove unnecessary items
+    startList = gradesList[15:-8]
+
+    # Final list Variable
+    finalList = []
+
+    # Loop through list and add any Taken courses, except for courses that have IP as a grade
+    for i in range(len(startList)):
+        if startList[i] == "Taken":
+            if startList[i-2] == "IP":
+                continue
+            finalList.append(startList[i-5] + "," + startList[i-4] + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
+
+    # Create CSV file 
+    with open(path + "/Grades.csv", "w", encoding="utf-8") as file:
+        file.write("code,name,score,credit\n")
+        for i in finalList:
+            file.write(i)
+            file.write("\n")
+    
+    # Empty the DB file
+    with open(path + "/grades.db", "w") as file:
+        pass
+    # Create new DB file
+    OpenDatabase()
+
+    # Tell user
+    print("Data Extracted Successfully")
+    time.sleep(2)
 
 
 if __name__ == "__main__":
