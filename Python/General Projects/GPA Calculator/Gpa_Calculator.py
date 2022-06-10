@@ -1,5 +1,4 @@
 # Necessary Imports
-from turtle import getscreen
 from cs50 import SQL, get_int, get_float
 import os
 import csv
@@ -28,7 +27,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Can Get Data from IAU"
+    updateMessage = "Can Get Data from IAU (Bug Fix)"
     checkForUpdate(updateMessage)
 
     while True:
@@ -661,7 +660,7 @@ def DataExtractor():
     # Loop through list and add any Taken courses, except for courses that have IP as a grade
     for i in range(len(startList)):
         if startList[i] == "Taken":
-            if startList[i-2] == "IP":
+            if startList[i-2] == "IP" or startList[i-2] == "NP" or startList[i-2] == "NF" or startList[i-2] == "W":
                 continue
             finalList.append(startList[i-5] + "," + startList[i-4] + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
 
