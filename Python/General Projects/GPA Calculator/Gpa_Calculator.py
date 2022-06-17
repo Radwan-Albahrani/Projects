@@ -27,7 +27,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Can Get Data from IAU (Bug Fix)"
+    updateMessage = "All files into UTF8"
     checkForUpdate(updateMessage)
 
     while True:
@@ -90,7 +90,7 @@ def OpenDatabase():
         if answer != 1:
             db.execute("CREATE TABLE grades (code TEXT, name TEXT, score NUMBER, credit NUMBER)")
             try: 
-                with open(path + "/Grades.csv") as file:
+                with open(path + "/Grades.csv", encoding="utf8") as file:
                     reader = csv.reader(file)
                     row1 = next(reader)
                     for row in reader:
@@ -98,7 +98,7 @@ def OpenDatabase():
 
             except FileNotFoundError:
                 # Open New CSV file
-                with open(path + "/Grades.csv", "w", newline='') as file:
+                with open(path + "/Grades.csv", "w", newline='', encoding="utf8") as file:
                     pass
                         
         return db
@@ -538,7 +538,7 @@ def SelectCourse(courseName):
 # Function to check and convert score based on if its a letter or a percentage
 def GetScore(score):
     # Dictionary to convert score
-    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d") : 65, ("F", "f") : 0}
+    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d", "D+", "D") : 65, ("F", "f") : 0}
     
     try:
         # if it passed as a percentage, check it, then return it
@@ -550,7 +550,7 @@ def GetScore(score):
     except ValueError:
         # Convert it directly using the letters convert dictionary if it was not a percentage
         for keys, values in GPAconvertLetters.items():
-            if score == keys[0] or score == keys[1]:
+            if score in keys:
                 score = values
                 return score
     
@@ -563,7 +563,7 @@ def exitRoutine():
     db = OpenDatabase()
 
     # Open New CSV file
-    with open(path + "/Grades.csv", "w", newline='') as file:
+    with open(path + "/Grades.csv", "w", newline='', encoding="utf8") as file:
         # Connect a writer
         writer = csv.writer(file)
         
@@ -665,7 +665,7 @@ def DataExtractor():
             finalList.append(startList[i-5] + "," + startList[i-4] + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
 
     # Create CSV file 
-    with open(path + "/Grades.csv", "w", encoding="utf-8") as file:
+    with open(path + "/Grades.csv", "w", encoding="utf8") as file:
         file.write("code,name,score,credit\n")
         for i in finalList:
             file.write(i)
