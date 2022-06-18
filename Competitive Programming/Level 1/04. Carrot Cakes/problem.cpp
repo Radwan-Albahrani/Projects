@@ -1,3 +1,5 @@
+// Link: https://codeforces.com/contest/799/problem/A
+
 #include <iostream>
 #define fast ios::sync_with_stdio(0), cin.tie(0)
 #define ll long long
