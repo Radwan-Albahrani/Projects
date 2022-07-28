@@ -27,7 +27,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "All files into UTF8"
+    updateMessage = "fixed Update after name change"
     checkForUpdate(updateMessage)
 
     while True:
@@ -581,7 +581,7 @@ def exitRoutine():
 def checkForUpdate(currentMessage):
     # Try to get the latest commit and compare the names. Else. Tell the user something is wrong with the internet
     try:
-        response = requests.get('https://api.github.com/repos/JackyXteam/Projects/commits?path=Python/General%20Projects/GPA%20Calculator&%20&page=1&per_page=1').json()
+        response = requests.get('https://api.github.com/repos/Radwan-Albahrani/Projects/commits?path=Python/General%20Projects/GPA%20Calculator&%20&page=1&per_page=1').json()
         newMessage = response[0]['commit']['message']
     except Exception as e:
         print("Something went wrong with the update checker. Check your internet connection.")
