@@ -2,9 +2,9 @@
 
 This section includes all courses and projects I have worked on using python. This includes:
 
-- GPA Calculator App.
-- Deep Learning Algorithms.
-- Mobile Application using Kivy
+- [GPA Calculator App](./General%20Projects/GPA%20Calculator/Gpa_Calculator.py).
+- [Deep Learning Algorithms](./Courses/KAUST%20AI/Final%20Project/dl-dataloader.ipynb).
+- [Mobile Application using Kivy](./General%20Projects/Property%20Map%20VIew/).
 - General Purpose Projects.
 
 ## Courses
