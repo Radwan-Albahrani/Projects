@@ -2,7 +2,7 @@
 
 This will Include different Projects I have made throughout my learning career. Here are some of the things I can do with different languages:
 
-## 1. Python Programming
+## 1. [Python Programming](Python)
 
 - Graphical user interfaces with linked Database.
 - File Manipulation.
@@ -13,7 +13,7 @@ This will Include different Projects I have made throughout my learning career. 
 - Populating UI Elements with Information.
 - Deep Learning and Artificial Intelligence.
 
-## 2. Standard C Programming
+## 2. [Standard C Programming](C)
 
 - CLI Programs.
 - Understanding of C Structure and Format.
@@ -22,7 +22,7 @@ This will Include different Projects I have made throughout my learning career. 
 - Usage and Understanding of Pointers.
 - Image Manipulation Algorithms.
 
-## 3. C# Programming
+## 3. [C# Programming](C#)
 
 - Player Controller from Scratch.
 - Game Field Necessary AIs.
