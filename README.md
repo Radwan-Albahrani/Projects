@@ -11,6 +11,7 @@ This will Include different Projects I have made throughout my learning career. 
 - Working with API
 - Clickable UI Elements.
 - Populating UI Elements with Information.
+- Deep Learning and Artificial Intelligence.
 
 ## 2. Standard C Programming
 
