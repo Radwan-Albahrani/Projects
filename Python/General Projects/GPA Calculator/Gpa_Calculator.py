@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Quick Bug Fix 2"
+    updateMessage = "Duplicate names bug fix"
     checkForUpdate(updateMessage)
 
     while True:
@@ -521,15 +521,20 @@ def PredictiveFunction():
     # Start a subject counter and necessary variables
     subjectCounter = 1
     scores = []
-
+    names = []
     # While not done with subjects
     while subjects > 0:
         # Get Subject Name
         subjectName = input(f"Enter the name of Subject number: {subjectCounter}: ")
+        if subjectName not in names:
+            names.append(subjectName)
+        else:
+            print("Name already Added. Try again")
+            continue
         
         # Get credit and score from user
         currentCredit = get_int(f"Please input credit hours for {subjectName}: ")
-
+       
         # Append score and credit to their appropriate lists
         scores.append({"name" : subjectName, "SubjectNumber" : subjectCounter, "credit" : currentCredit}) 
 
