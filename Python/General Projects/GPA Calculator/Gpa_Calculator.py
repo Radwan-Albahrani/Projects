@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Progress Bar for Downloads"
+    updateMessage = "Update Function Overhaul"
     checkForUpdate(updateMessage)
 
     while True:
