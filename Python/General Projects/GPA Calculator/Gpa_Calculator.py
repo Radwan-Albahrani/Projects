@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Predictive Calculations"
+    updateMessage = "Predictive Calculations (Minor Bug Fix)"
     checkForUpdate(updateMessage)
 
     while True:
@@ -596,7 +596,7 @@ def PredictiveFunction():
         loopGPA = round((totalPoints + tempPoints) / totalHours, 3)
         
         # If GPA is higher than expected, add it to permutations
-        if tempPoints >= neededPoints:
+        if loopGPA >= expectedGPA:
             permutationsFound.append({})
             for score in scores:
                 permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
@@ -627,7 +627,7 @@ def PredictiveFunction():
             tempPoints += raw * credit
         
         # If GPA is higher than expected, add it to permutations
-        if tempPoints >= neededPoints:
+        if loopGPA >= expectedGPA:
             permutationsFound.append({})
             for score in scores:
                 permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
