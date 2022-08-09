@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Update Function Overhaul"
+    updateMessage = "D+ Support"
     checkForUpdate(updateMessage)
 
     while True:
@@ -317,7 +317,7 @@ def DisplayDatabase():
 # change the scores of a dataFrame
 def ChangeScores(df:pd.DataFrame):
     # Dictionary to convert to letters
-    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A", (85, 90) : "B+", (80, 85) : "B", (75, 80): "C+", (70 , 75) : "C", (60, 70) : "D", (0, 60) : "F"}
+    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A", (85, 90) : "B+", (80, 85) : "B", (75, 80): "C+", (70 , 75) : "C", (67, 70) : "D+", (60, 67) : "D", (0, 60) : "F"}
 
     # Loop over the DataFrame
     for index, row in df.iterrows():
@@ -540,7 +540,7 @@ def SelectCourse(courseName):
 # Function to check and convert score based on if its a letter or a percentage
 def GetScore(score):
     # Dictionary to convert score
-    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D", "d", "D+", "D") : 65, ("F", "f") : 0}
+    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D+", "d+") : 68, ("D", "d") : 65,  ("F", "f") : 0}
     
     try:
         # if it passed as a percentage, check it, then return it
