@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Stay in Predictive until you type -1"
+    updateMessage = "Quick Bug Fix"
     checkForUpdate(updateMessage)
 
     while True:
@@ -555,16 +555,16 @@ def PredictiveFunction():
     maximumGPA = round(maxPoints/totalHours, 3)
     print(f"Maximum GPA this term is: {maximumGPA}\n")
     
-    # Start a List to keep track of permutations
-    permutationsFound = []
-    listCounter = 0
-    
     # Get all possible GPA permutations
     GPAValues = list(GPAconvert.keys())
     GPAValues = [x for item in GPAValues for x in repeat(item, subjectCounter-1)]
     allPossible = set(combinations(GPAValues, subjectCounter-1))
     expectedGPA = 0
     while expectedGPA != -1:
+        # Start a List to keep track of permutations
+        permutationsFound = []
+        listCounter = 0
+        
         # Get expected GPA
         expectedGPA = get_float("What do you want your GPA to be (-1 to go back to menu): ")
         if expectedGPA == -1:
