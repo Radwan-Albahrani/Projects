@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Predictive Calculations (Minor Bug Fix)"
+    updateMessage = "Stay in Predictive until you type -1"
     checkForUpdate(updateMessage)
 
     while True:
@@ -554,19 +554,6 @@ def PredictiveFunction():
     # Print Maximum GPA
     maximumGPA = round(maxPoints/totalHours, 3)
     print(f"Maximum GPA this term is: {maximumGPA}\n")
-
-    # Get expected GPA
-    expectedGPA = get_float("What do you want your GPA to be: ")
-    
-    # If expected is bigger than Maximum
-    if expectedGPA > maximumGPA:
-        print(f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
-        return -1
-    
-    # Calculate Needed Points
-    neededPoints = totalHours * expectedGPA
-    neededPoints -= totalPoints
-    neededPoints = abs(neededPoints)
     
     # Start a List to keep track of permutations
     permutationsFound = []
@@ -576,69 +563,78 @@ def PredictiveFunction():
     GPAValues = list(GPAconvert.keys())
     GPAValues = [x for item in GPAValues for x in repeat(item, subjectCounter-1)]
     allPossible = set(combinations(GPAValues, subjectCounter-1))
-        
-    # Loop through All permutations
-    for permutation in tqdm(allPossible, leave=False):
-        
-        # Set the raw scores and letter grades
-        for index in range(len(permutation)):
-            scores[index]["RawScore"] = permutation[index]
-            scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
-        
-        # Calculate GPA for the specified raw scores and letter grades
-        tempPoints = 0
-        for i in range(len(scores)):
-            # Get appropriate credit hour for raw score
-            credit = scores[i]["credit"]
-            raw = scores[i]["RawScore"]
-            # Calculate points and add it to total points
-            tempPoints += raw * credit
-        loopGPA = round((totalPoints + tempPoints) / totalHours, 3)
-        
-        # If GPA is higher than expected, add it to permutations
-        if loopGPA >= expectedGPA:
-            permutationsFound.append({})
-            for score in scores:
-                permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
-            permutationsFound[listCounter]["GPA"] = loopGPA
-            listCounter += 1
-        
-        # If the reverse is not the same as the normal one
-        permutation = list(permutation)
-        if permutation == permutation[::-1]:
-            continue 
-        
-        # if its not the same, Continue
-        permutation.reverse()
-        
-        # Set the raw scores and letter grades
-        for index in range(len(permutation)):
-            scores[index]["RawScore"] = permutation[index]
-            scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
-        
-        # Calculate GPA for the specified raw scores and letter grades
-        tempPoints = 0
-        for i in range(len(scores)):
-            # Get appropriate credit hour for raw score
-            credit = scores[i]["credit"]
-            raw = scores[i]["RawScore"]
+    expectedGPA = 0
+    while expectedGPA != -1:
+        # Get expected GPA
+        expectedGPA = get_float("What do you want your GPA to be (-1 to go back to menu): ")
+        if expectedGPA == -1:
+            break
+        # If expected is bigger than Maximum
+        if expectedGPA > maximumGPA:
+            print(f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
+            continue  
+        # Loop through All permutations
+        for permutation in tqdm(allPossible, leave=False):
             
-            # Calculate points and add it to total points
-            tempPoints += raw * credit
-        
-        # If GPA is higher than expected, add it to permutations
-        if loopGPA >= expectedGPA:
-            permutationsFound.append({})
-            for score in scores:
-                permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
-            permutationsFound[listCounter]["GPA"] = loopGPA
-            listCounter += 1
-    # Prepare Printable
-    print("Possible Grades to achieve the GPA: ")
-    printableData = pd.DataFrame(permutationsFound)
-    printableData = printableData.sort_values("GPA")
-    printableData = printableData.reset_index(drop=True)
-    print(printableData)
+            # Set the raw scores and letter grades
+            for index in range(len(permutation)):
+                scores[index]["RawScore"] = permutation[index]
+                scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
+            
+            # Calculate GPA for the specified raw scores and letter grades
+            tempPoints = 0
+            for i in range(len(scores)):
+                # Get appropriate credit hour for raw score
+                credit = scores[i]["credit"]
+                raw = scores[i]["RawScore"]
+                # Calculate points and add it to total points
+                tempPoints += raw * credit
+            loopGPA = round((totalPoints + tempPoints) / totalHours, 3)
+            
+            # If GPA is higher than expected, add it to permutations
+            if loopGPA >= expectedGPA:
+                permutationsFound.append({})
+                for score in scores:
+                    permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
+                permutationsFound[listCounter]["GPA"] = loopGPA
+                listCounter += 1
+            
+            # If the reverse is not the same as the normal one
+            permutation = list(permutation)
+            if permutation == permutation[::-1]:
+                continue 
+            
+            # if its not the same, Continue
+            permutation.reverse()
+            
+            # Set the raw scores and letter grades
+            for index in range(len(permutation)):
+                scores[index]["RawScore"] = permutation[index]
+                scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
+            
+            # Calculate GPA for the specified raw scores and letter grades
+            tempPoints = 0
+            for i in range(len(scores)):
+                # Get appropriate credit hour for raw score
+                credit = scores[i]["credit"]
+                raw = scores[i]["RawScore"]
+                
+                # Calculate points and add it to total points
+                tempPoints += raw * credit
+            
+            # If GPA is higher than expected, add it to permutations
+            if loopGPA >= expectedGPA:
+                permutationsFound.append({})
+                for score in scores:
+                    permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
+                permutationsFound[listCounter]["GPA"] = loopGPA
+                listCounter += 1
+        # Prepare Printable
+        print("Possible Grades to achieve the GPA: ")
+        printableData = pd.DataFrame(permutationsFound)
+        printableData = printableData.sort_values("GPA")
+        printableData = printableData.reset_index(drop=True)
+        print(printableData)
     
 # Function to select specific course from database
 def SelectCourse(courseName):
