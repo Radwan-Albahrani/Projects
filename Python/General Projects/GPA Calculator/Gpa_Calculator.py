@@ -1,5 +1,4 @@
 # Necessary Imports
-from turtle import down
 from cs50 import SQL, get_int, get_float
 import os
 import csv
@@ -12,6 +11,7 @@ import sys
 from bs4 import BeautifulSoup
 from pwinput import pwinput
 from tqdm import tqdm
+from itertools import combinations, repeat
 
 # Disable requests logging
 urllib3_log = logging.getLogger("urllib3")
@@ -29,7 +29,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "D+ Support"
+    updateMessage = "Predictive Calculations"
     checkForUpdate(updateMessage)
 
     while True:
@@ -41,8 +41,9 @@ def main():
         print("3. Modify Course.")
         print("4. View Current Database.")
         print("5. Calculate expected GPA.")
-        print("6. Get Data from SIS website.")
-        print("7. Exit.")
+        print("6. Calculate Needed Scores to maintain a GPA.")
+        print("7. Get Data from SIS website.")
+        print("8. Exit.")
 
         response = get_int("Choice: ")
 
@@ -67,11 +68,14 @@ def main():
             # Calculating GPA
             case 5:
                 CalculateGPA()
-            
+            # Predictive GPA function
             case 6:
+                PredictiveFunction()
+            # SIS Gathering
+            case 7:
                 DataExtractor()
             # Exiting Program
-            case 7:
+            case 8:
                 exitRoutine()
                 break
 
@@ -291,8 +295,7 @@ def ModifyCourse():
                         break
         else:
             print("Action Cancelled.")
-            time.sleep(1)
-                
+            time.sleep(1)               
 
 # Function to display Database
 def DisplayDatabase():
@@ -317,7 +320,7 @@ def DisplayDatabase():
 # change the scores of a dataFrame
 def ChangeScores(df:pd.DataFrame):
     # Dictionary to convert to letters
-    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A", (85, 90) : "B+", (80, 85) : "B", (75, 80): "C+", (70 , 75) : "C", (67, 70) : "D+", (60, 67) : "D", (0, 60) : "F"}
+    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A ", (85, 90) : "B+", (80, 85) : "B ", (75, 80): "C+", (70 , 75) : "C ", (67, 70) : "D+", (60, 67) : "D ", (0, 60) : "F "}
 
     # Loop over the DataFrame
     for index, row in df.iterrows():
@@ -331,16 +334,13 @@ def ChangeScores(df:pd.DataFrame):
         # Loop through keys to determine where the grade lies. Then append the corresponding Letter grade
         for keys, values in GPAconvert.items():
             if score >= keys[0] and score < keys[1]:
-                if len(values) == 2:
-                    df.loc[index, "score"] = values
-                else:
-                    df.loc[index, "score"] = values + " "
+                df.loc[index, "score"] = values
                 break
     # Return the modified DataFrame
     return df
 
 # Function to Calculate GPA
-def CalculateGPA():
+def CalculateGPA(GetGPA = 0):
     # Prepare list of associations
     GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
     
@@ -348,67 +348,81 @@ def CalculateGPA():
     totalPoints = 0
     totalHours = 0
 
-    # Start a loop to check if user wants cumulative gpa or term gpa.
-    while True:
-        # Ask user for input
-        question = input("Cumulative score or term score? (1 for [Using Database], 2 for [Manual Input]): ")
+    # If this is calling the function directly
+    if GetGPA == 0:
+        while True:
+            # Ask user for input
+            question = input("Cumulative GPA (using Database) or term GPA (Manual Input)? (1 for [Using Database], 2 for [Manual Input]): ")
 
-        # If user wants cumulative score:
-        if question == "1":
+            # If user wants cumulative score:
+            if question == "1":
 
-            # Call function to open database
-            db = OpenDatabase()
+                # Call function to open database
+                db = OpenDatabase()
 
-            # Get scores from table
-            scores = db.execute("SELECT score FROM grades")
+                # Get scores from table
+                scores = db.execute("SELECT score FROM grades")
 
-            # Get credit hours from table
-            credits = db.execute("SELECT credit FROM grades")
+                # Get credit hours from table
+                credits = db.execute("SELECT credit FROM grades")
 
-            # Get number of subjects
-            subjects = get_int("Please input the number of subjects you want to test (0 if already in database): ")
+                # Get number of subjects
+                subjects = get_int("Please input the number of subjects you want to test (0 if already in database): ")
 
-            # Get out of loop.
-            break
-        
-        # if user wants term score:
-        elif question == "2":
-            # Create empty lists
-            scores = []
-            credits = []
-
-            # Ask if you want to input previous GPA
-            previous = input("Do you want to input your previous GPA? (y/n): ")
-
-            # Get previous GPA data
-            while True:
-                if previous.lower() == "y":
-                    # Get previous and credit
-                    currentGPA = get_float("Enter your previous GPA: ")
-                    totalCredit = get_int("Enter your total credit hours so far: ")
-
-                    # Add to total points and total credit
-                    totalPoints = currentGPA * totalCredit
-                    totalHours += totalCredit
-                    break
-                # If no previous GPA, get out of loop.
-                elif previous.lower() == "n":
-                    break
-                else:
-                    print("Invalid input.")
-                    continue
-            # Get number of subjects
-            subjects = get_int("Please input the number of subjects you want to test: ")
-            if subjects == 0:
-                print("No Subjects Entered")
-            # Get out of loop
-            break
-
-        # If input was invalid:
-        else:
-            # Tell user and reloop.
-            print("Choice in valid, try again.")
+                # Get out of loop.
+                break
             
+            # if user wants term score:
+            elif question == "2":
+                # Create empty lists
+                scores = []
+                credits = []
+
+                # Ask if you want to input previous GPA
+                previous = input("Do you want to input your previous GPA? (y/n): ")
+
+                # Get previous GPA data
+                while True:
+                    if previous.lower() == "y":
+                        # Get previous and credit
+                        currentGPA = get_float("Enter your previous GPA: ")
+                        totalCredit = get_int("Enter your total credit hours so far: ")
+
+                        # Add to total points and total credit
+                        totalPoints = currentGPA * totalCredit
+                        totalHours += totalCredit
+                        break
+                    # If no previous GPA, get out of loop.
+                    elif previous.lower() == "n":
+                        break
+                    else:
+                        print("Invalid input.")
+                        continue
+                # Get number of subjects
+                subjects = get_int("Please input the number of subjects you want to test: ")
+                if subjects == 0:
+                    print("No Subjects Entered")
+                # Get out of loop
+                break
+
+            # If input was invalid:
+            else:
+                # Tell user and reloop.
+                print("Choice in valid, try again.")
+    # If calling from predictive Function
+    else:
+        # Call function to open database
+        db = OpenDatabase()
+
+        # Get scores from table
+        scores = db.execute("SELECT score FROM grades")
+
+        # Get credit hours from table
+        credits = db.execute("SELECT credit FROM grades") 
+        
+        # No Subject
+        subjects = 0
+    
     # Prepare list to figure out raw scores.
     rawScores = []
 
@@ -422,18 +436,18 @@ def CalculateGPA():
         
         # loop
         while True:
-                # Get a score from the user
-                currentScore = input(f"Please input score for subject number {subjectCounter}: ")
-                
-                # Get the accurate score from the function
-                currentScore = GetScore(currentScore)
+            # Get a score from the user
+            currentScore = input(f"Please input score for subject number {subjectCounter}: ")
+            
+            # Get the accurate score from the function
+            currentScore = GetScore(currentScore)
 
-                # If score found, add it to database and exit loop
-                if currentScore == -1:
-                    print("Score invalid, Try again.")
-                    continue
-                else:
-                    break
+            # If score found, add it to database and exit loop
+            if currentScore == -1:
+                print("Score invalid, Try again.")
+                continue
+            else:
+                break
 
 
         # Increment subject counter
@@ -475,11 +489,157 @@ def CalculateGPA():
     
     # Print current GPA
     try:
-        print(f"Calculated GPA: {round(totalPoints/totalHours, 3)}")
+        GPA = round(totalPoints/totalHours, 3)
+        if GetGPA == 0:
+            print(f"Calculated GPA: {GPA}")
+        time.sleep(1)
+        return totalPoints, totalHours
     except ZeroDivisionError:
-        print("No Courses Entered. Try again.")
-    time.sleep(1)
+        print("No Courses Found. Try again.")
+        time.sleep(1)
+        return [-1, -1]
+    
+# Predict GPA scores
+def PredictiveFunction():
+    # Prepare list of associations
+    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D ", 2.00 : "F "}
+    
+    # Get Total points and total hours from the GPA function
+    totalPoints, totalHours = CalculateGPA(1)
+    
+    # If no scores found
+    if totalHours == 0:
+        return -1
+    
+    # Print out Current GPA
+    currentGPA = round(totalPoints/totalHours, 3)
+    print(f"Current GPA: {currentGPA}")
+    
+    # Get number of subjects
+    subjects = get_int("How many subjects are you taking this Term: ")
+    
+    # Start a subject counter and necessary variables
+    subjectCounter = 1
+    scores = []
 
+    # While not done with subjects
+    while subjects > 0:
+        # Get Subject Name
+        subjectName = input(f"Enter the name of Subject number: {subjectCounter}: ")
+        
+        # Get credit and score from user
+        currentCredit = get_int(f"Please input credit hours for {subjectName}: ")
+
+        # Append score and credit to their appropriate lists
+        scores.append({"name" : subjectName, "SubjectNumber" : subjectCounter, "credit" : currentCredit}) 
+
+        # Add hours
+        totalHours += currentCredit
+
+        # Increment subject counter
+        subjectCounter += 1
+
+        # Reduce subjects by 1.
+        subjects -= 1
+    
+    # Loop through Scores
+    maxPoints = totalPoints
+    for i in range(len(scores)):
+        # Get appropriate credit hour for raw score
+        credit = scores[i]["credit"]
+        
+        # Calculate points and add it to total points
+        maxPoints += 5.00 * credit
+    
+    # Print Maximum GPA
+    maximumGPA = round(maxPoints/totalHours, 3)
+    print(f"Maximum GPA this term is: {maximumGPA}\n")
+
+    # Get expected GPA
+    expectedGPA = get_float("What do you want your GPA to be: ")
+    
+    # If expected is bigger than Maximum
+    if expectedGPA > maximumGPA:
+        print(f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
+        return -1
+    
+    # Calculate Needed Points
+    neededPoints = totalHours * expectedGPA
+    neededPoints -= totalPoints
+    neededPoints = abs(neededPoints)
+    
+    # Start a List to keep track of permutations
+    permutationsFound = []
+    listCounter = 0
+    
+    # Get all possible GPA permutations
+    GPAValues = list(GPAconvert.keys())
+    GPAValues = [x for item in GPAValues for x in repeat(item, subjectCounter-1)]
+    allPossible = set(combinations(GPAValues, subjectCounter-1))
+        
+    # Loop through All permutations
+    for permutation in tqdm(allPossible, leave=False):
+        
+        # Set the raw scores and letter grades
+        for index in range(len(permutation)):
+            scores[index]["RawScore"] = permutation[index]
+            scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
+        
+        # Calculate GPA for the specified raw scores and letter grades
+        tempPoints = 0
+        for i in range(len(scores)):
+            # Get appropriate credit hour for raw score
+            credit = scores[i]["credit"]
+            raw = scores[i]["RawScore"]
+            # Calculate points and add it to total points
+            tempPoints += raw * credit
+        loopGPA = round((totalPoints + tempPoints) / totalHours, 3)
+        
+        # If GPA is higher than expected, add it to permutations
+        if tempPoints >= neededPoints:
+            permutationsFound.append({})
+            for score in scores:
+                permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
+            permutationsFound[listCounter]["GPA"] = loopGPA
+            listCounter += 1
+        
+        # If the reverse is not the same as the normal one
+        permutation = list(permutation)
+        if permutation == permutation[::-1]:
+            continue 
+        
+        # if its not the same, Continue
+        permutation.reverse()
+        
+        # Set the raw scores and letter grades
+        for index in range(len(permutation)):
+            scores[index]["RawScore"] = permutation[index]
+            scores[index]["LetterGrade"] = GPAconvert[permutation[index]]
+        
+        # Calculate GPA for the specified raw scores and letter grades
+        tempPoints = 0
+        for i in range(len(scores)):
+            # Get appropriate credit hour for raw score
+            credit = scores[i]["credit"]
+            raw = scores[i]["RawScore"]
+            
+            # Calculate points and add it to total points
+            tempPoints += raw * credit
+        
+        # If GPA is higher than expected, add it to permutations
+        if tempPoints >= neededPoints:
+            permutationsFound.append({})
+            for score in scores:
+                permutationsFound[listCounter][score["name"]] = score["LetterGrade"] 
+            permutationsFound[listCounter]["GPA"] = loopGPA
+            listCounter += 1
+    # Prepare Printable
+    print("Possible Grades to achieve the GPA: ")
+    printableData = pd.DataFrame(permutationsFound)
+    printableData = printableData.sort_values("GPA")
+    printableData = printableData.reset_index(drop=True)
+    print(printableData)
+    
 # Function to select specific course from database
 def SelectCourse(courseName):
     #Open Database
@@ -695,10 +855,7 @@ def DataExtractor():
     text = '\n'.join(chunk for chunk in chunks if chunk)
 
     # Create a list from the text
-    gradesList = list(text.split("\n"))
-
-    # Remove unnecessary items
-    startList = gradesList[15:-8]
+    startList = list(text.split("\n"))
 
     # Final list Variable
     finalList = []
