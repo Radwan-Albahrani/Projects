@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from pwinput import pwinput
 from tqdm import tqdm
 from itertools import combinations, repeat, permutations
+from sympy.utilities.iterables import multiset_combinations, multiset_permutations
 
 # Disable requests logging
 urllib3_log = logging.getLogger("urllib3")
@@ -29,7 +30,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Duplicate names bug fix"
+    updateMessage = "Maximum subjects for prediction + Refractoring"
     checkForUpdate(updateMessage)
 
     while True:
@@ -52,19 +53,15 @@ def main():
             # Adding Courses
             case 1:
                 AddCourse()
-            
             # Deleting Courses
             case 2:
                 DeleteCourse()
-            
             # Modifying Scores
             case 3:
                 ModifyCourse()
-            
             # Displaying Database
             case 4:
                 DisplayDatabase()
-            
             # Calculating GPA
             case 5:
                 CalculateGPA()
@@ -501,8 +498,7 @@ def CalculateGPA(GetGPA = 0):
     
 # Predict GPA scores
 def PredictiveFunction():
-    # Prepare list of associations
-    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D ", 2.00 : "F "}
+    maxSubjects = 7
     
     # Get Total points and total hours from the GPA function
     totalPoints, totalHours = CalculateGPA(1)
@@ -518,10 +514,39 @@ def PredictiveFunction():
     # Get number of subjects
     subjects = get_int("How many subjects are you taking this Term: ")
     
-    # Start a subject counter and necessary variables
-    subjectCounter = 1
-    scores = []
+    # Confirm Maximum subjects with user
+    if subjects > maxSubjects:
+        predictContinue = input("Too many subjects to predict. This function will only tell you the maximum GPA. Do you want to continue? (y/n): ")
+        if predictContinue.lower() != "y":
+            return
+    
+    scores, totalHours = GetSubjectsPredict(subjects, totalHours)
+    
+    # Loop through Scores
+    maxPoints = totalPoints
+    for i in range(len(scores)):
+        # Get appropriate credit hour for raw score
+        credit = scores[i]["credit"]
+        
+        # Calculate points and add it to total points
+        maxPoints += 5.00 * credit
+    
+    # Print Maximum GPA
+    maximumGPA = round(maxPoints/totalHours, 3)
+    print(f"Maximum GPA this term is: {maximumGPA}\n")
+    time.sleep(1)
+    if subjects > maxSubjects:
+        print("Too many Subjects to calculate possibilities.")
+        return
+    
+    # Start the prediction Process
+    CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints)
+
+# Get subjects for predictive Function
+def GetSubjectsPredict(subjects, totalHours):
     names = []
+    scores = []
+    subjectCounter = 1
     # While not done with subjects
     while subjects > 0:
         # Get Subject Name
@@ -547,23 +572,18 @@ def PredictiveFunction():
         # Reduce subjects by 1.
         subjects -= 1
     
-    # Loop through Scores
-    maxPoints = totalPoints
-    for i in range(len(scores)):
-        # Get appropriate credit hour for raw score
-        credit = scores[i]["credit"]
-        
-        # Calculate points and add it to total points
-        maxPoints += 5.00 * credit
-    
-    # Print Maximum GPA
-    maximumGPA = round(maxPoints/totalHours, 3)
-    print(f"Maximum GPA this term is: {maximumGPA}\n")
+    return scores, totalHours
+
+# Calculate all Predictions
+def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
+    # Prepare list of associations
+    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D ", 2.00 : "F "}
     
     # Get all possible GPA permutations
     GPAValues = list(GPAconvert.keys())
-    GPAValues = [x for item in GPAValues for x in repeat(item, subjectCounter-1)]
-    allPossible = set(combinations(GPAValues, subjectCounter-1))
+    GPAValues = [x for item in GPAValues for x in repeat(item, subjects)]
+    allPossible = list(multiset_combinations(GPAValues, subjects))
+
     expectedGPA = 0
     while expectedGPA != -1:
         # Start a List to keep track of permutations
@@ -580,7 +600,7 @@ def PredictiveFunction():
             continue  
         # Loop through All permutations
         for combination in tqdm(allPossible, leave=False):
-            All = set(permutations(combination, len(combination)))
+            All = multiset_permutations(combination, len(combination))
             for permutation in All:
                 # Set the raw scores and letter grades
                 for index in range(len(permutation)):
@@ -610,8 +630,8 @@ def PredictiveFunction():
         printableData = pd.DataFrame(permutationsFound)
         printableData = printableData.sort_values("GPA")
         printableData = printableData.reset_index(drop=True)
-        print(printableData)
-    
+        print(printableData.loc[printableData["GPA"] == printableData["GPA"][0]])
+
 # Function to select specific course from database
 def SelectCourse(courseName):
     #Open Database
@@ -855,7 +875,6 @@ def DataExtractor():
     # Tell user
     print("Data Extracted Successfully")
     time.sleep(2)
-
 
 if __name__ == "__main__":
     main()
