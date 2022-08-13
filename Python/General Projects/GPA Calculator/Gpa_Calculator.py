@@ -11,7 +11,7 @@ import sys
 from bs4 import BeautifulSoup
 from pwinput import pwinput
 from tqdm import tqdm
-from itertools import combinations, repeat, permutations
+from itertools import repeat
 from sympy.utilities.iterables import multiset_combinations, multiset_permutations
 
 # Disable requests logging
