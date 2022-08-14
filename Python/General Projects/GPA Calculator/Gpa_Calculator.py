@@ -30,7 +30,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Prediction Optimizations"
+    updateMessage = "Removed Debugger Prints, added Error Log"
     checkForUpdate(updateMessage)
 
     while True:
@@ -519,6 +519,9 @@ def PredictiveSetup():
         predictContinue = input("Too many subjects to predict. This function will only tell you the maximum GPA. Do you want to continue? (y/n): ")
         if predictContinue.lower() != "y":
             return
+    if subjects <= 0:
+        print("Cannot have negative or no subjects")
+        return
     
     scores, totalHours = GetSubjectsPredict(subjects, totalHours)
     
@@ -661,9 +664,7 @@ def _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints):
         tempPoints += lowestCredit * value
         tempGPA = round(tempPoints / totalHours, 3)
         if tempGPA < expectedGPA:
-            print(f"Before Pop: {GPAValues}, Index: {index}, GPA {tempGPA}")
             GPAValues = GPAValues[0:index]
-            print(f"After Pop: {GPAValues}")
             break
     # Return new optimized list
     return GPAValues
@@ -913,4 +914,14 @@ def DataExtractor():
     time.sleep(2)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        try:
+            os.mkdir("CrashLog")
+        except FileExistsError:
+            pass
+        logging.basicConfig(filename="CrashLog/ErrorLog.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
+        logging.exception(e)
+        print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
+        time.sleep(3)
