@@ -30,7 +30,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Maximum subjects for prediction + Refractoring"
+    updateMessage = "Prediction Optimizations"
     checkForUpdate(updateMessage)
 
     while True:
@@ -67,7 +67,7 @@ def main():
                 CalculateGPA()
             # Predictive GPA function
             case 6:
-                PredictiveFunction()
+                PredictiveSetup()
             # SIS Gathering
             case 7:
                 DataExtractor()
@@ -497,7 +497,7 @@ def CalculateGPA(GetGPA = 0):
         return [-1, -1]
     
 # Predict GPA scores
-def PredictiveFunction():
+def PredictiveSetup():
     maxSubjects = 7
     
     # Get Total points and total hours from the GPA function
@@ -578,12 +578,8 @@ def GetSubjectsPredict(subjects, totalHours):
 def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
     # Prepare list of associations
     GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D ", 2.00 : "F "}
-    
-    # Get all possible GPA permutations
-    GPAValues = list(GPAconvert.keys())
-    GPAValues = [x for item in GPAValues for x in repeat(item, subjects)]
-    allPossible = list(multiset_combinations(GPAValues, subjects))
 
+    # Start a loop to keep the user here until they are done with the function
     expectedGPA = 0
     while expectedGPA != -1:
         # Start a List to keep track of permutations
@@ -597,7 +593,16 @@ def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
         # If expected is bigger than Maximum
         if expectedGPA > maximumGPA:
             print(f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
-            continue  
+            continue
+        
+        # Get possible GPAs then remove any unnecessary Values
+        GPAValues = list(GPAconvert.keys())
+        GPAValues = _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints)
+
+        # Repeat and get all possible combinations
+        GPAValues = [x for item in GPAValues for x in repeat(item, subjects)]
+        allPossible = list(multiset_combinations(GPAValues, subjects))
+
         # Loop through All permutations
         for combination in tqdm(allPossible, leave=False):
             All = multiset_permutations(combination, len(combination))
@@ -631,6 +636,37 @@ def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
         printableData = printableData.sort_values("GPA")
         printableData = printableData.reset_index(drop=True)
         print(printableData.loc[printableData["GPA"] == printableData["GPA"][0]])
+
+# Remove unnecessary values in GPA prediction
+def _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints):
+    # Get the lowest Credit
+    lowestCredit = min(scores, key=lambda x:x['credit'])
+    lowestCredit = lowestCredit["credit"]
+    
+    # Get total points
+    minPoints = totalPoints
+    passedLowest = False
+
+    # Assume everything else is A+ except for the lowest Credit
+    for i in range(len(scores)):
+        credit = scores[i]["credit"]
+        if credit == lowestCredit and not passedLowest:
+            passedLowest = True
+            continue
+        minPoints += credit * 5.00
+    
+    # Test out lowest credit and once it fails, eliminate everything lower than it
+    for index, value in enumerate(GPAValues):
+        tempPoints = minPoints
+        tempPoints += lowestCredit * value
+        tempGPA = round(tempPoints / totalHours, 3)
+        if tempGPA < expectedGPA:
+            print(f"Before Pop: {GPAValues}, Index: {index}, GPA {tempGPA}")
+            GPAValues = GPAValues[0:index]
+            print(f"After Pop: {GPAValues}")
+            break
+    # Return new optimized list
+    return GPAValues
 
 # Function to select specific course from database
 def SelectCourse(courseName):
