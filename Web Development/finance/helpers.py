@@ -70,7 +70,7 @@ def usd(value):
 
 def found(userSymbol, allsymbols):
     # Look through all the symbols and find all matching, then convert them into a list
-    found = list(filter(lambda symbol: userSymbol in symbol["name"], allsymbols))
+    found = found = list(filter(lambda symbol: userSymbol in str(symbol["Name"]), allsymbols))
         
     # If a list exists
     if found:
@@ -80,7 +80,7 @@ def found(userSymbol, allsymbols):
         # Loop through list
         for item in found:
             # Append the symbol only into datasymbols
-            DataSymbols.append(item["symbol"])
+            DataSymbols.append(item["Symbol"])
 
         # After loop, Join all symbols with comma in between
         totalSymbols = ",".join(DataSymbols)

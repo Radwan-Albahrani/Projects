@@ -292,7 +292,7 @@ def login():
         
         # Retrieve all symbols once for later use.
         global allsymbols
-        allsymbols = requests.get("https://api.iextrading.com/1.0/ref-data/symbols").json()
+        allsymbols =  pd.read_csv(r"AllSymbols.csv").to_dict('records')
 
         # Redirect user to home page
         return redirect("/")
