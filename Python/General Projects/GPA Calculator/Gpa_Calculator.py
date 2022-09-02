@@ -30,7 +30,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Removed Debugger Prints, added Error Log"
+    updateMessage = "Prevented Error when Closing Program"
     checkForUpdate(updateMessage)
 
     while True:
@@ -918,10 +918,11 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         try:
+            time.sleep(0.1)
             os.mkdir("CrashLog")
         except FileExistsError:
             pass
-        logging.basicConfig(filename="CrashLog/ErrorLog.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
+        logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
         logging.exception(e)
         print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
         time.sleep(3)
