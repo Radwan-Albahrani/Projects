@@ -261,8 +261,12 @@ def history(pagenum):
         # How many pages
         length = math.ceil(len(mainHistory) / items_per_page)
         
-        # Render Page
-        return render_template("history.html", table = PageResult(mainHistory, pagenum), length = length)
+        # Prevent user from going to a page below 1
+        if int(pagenum) < 1:
+            return redirect("/history/1")
+        else:
+            # Render Page
+            return render_template("history.html", table=PageResult(mainHistory, pagenum), length=length)
     else:
         return render_template("history.html")
 
