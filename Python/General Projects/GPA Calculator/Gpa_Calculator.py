@@ -10,13 +10,14 @@ import logging
 import sys
 from bs4 import BeautifulSoup
 from pwinput import pwinput
+from sqlalchemy import false
 from tqdm import tqdm
 from itertools import repeat
 from sympy.utilities.iterables import multiset_combinations, multiset_permutations
+from googletrans import Translator
 
 # Disable requests logging
-urllib3_log = logging.getLogger("urllib3")
-urllib3_log.setLevel(logging.CRITICAL)
+logging.disable(logging.CRITICAL)
 
 # make a global Path Variable
 parent_dir = os.getenv("APPDATA")
@@ -30,7 +31,7 @@ except FileExistsError:
 # Main Function
 def main():
     # Check if an update is available
-    updateMessage = "Prevented Error when Closing Program"
+    updateMessage = "Added Subject Translation to English"
     checkForUpdate(updateMessage)
 
     while True:
@@ -894,7 +895,10 @@ def DataExtractor():
         if startList[i] == "Taken":
             if startList[i-2] == "IP" or startList[i-2] == "NP" or startList[i-2] == "NF" or startList[i-2] == "W":
                 continue
-            finalList.append(startList[i-5] + "," + startList[i-4] + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
+            translator = Translator()
+            subject = translator.translate(startList[i-4])
+            subject = subject.text
+            finalList.append(startList[i-5] + "," + str(subject) + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
 
     # Create CSV file 
     with open(path + "/Grades.csv", "w", encoding="utf8") as file:
@@ -922,6 +926,7 @@ if __name__ == "__main__":
             os.mkdir("CrashLog")
         except FileExistsError:
             pass
+        logging.disable(logging.NOTSET)
         logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
         logging.exception(e)
         print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
