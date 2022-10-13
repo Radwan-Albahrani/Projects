@@ -28,10 +28,17 @@ try:
 except FileExistsError:
     pass
 
+# Global Variables
+isModified = True
+cached = []
+
 # Main Function
 def main():
+    # Global Variable
+    global isModified
+
     # Check if an update is available
-    updateMessage = "View Database now calculates GPA"
+    updateMessage = "Added Caching for faster GPA Display"
     checkForUpdate(updateMessage)
 
     while True:
@@ -65,7 +72,8 @@ def main():
                 DisplayDatabase()
             # Calculating GPA
             case 5:
-                CalculateGPA()
+                isModified = True
+                CalculateGPA(manual=1)
             # Predictive GPA function
             case 6:
                 PredictiveSetup()
@@ -109,6 +117,7 @@ def OpenDatabase():
 
 # Function to add a course to the database
 def AddCourse():
+    global isModified
     # Get number of courses to add
     counter = get_int("How many courses do you want to add: ")
 
@@ -157,6 +166,7 @@ def AddCourse():
     for i in range(len(courseList)):
         print(f"Adding course: {courseList[i]}")
         db.execute("INSERT INTO grades VALUES(?)", courseList[i])
+        isModified = True
 
     # Notify User after done.
     print("All Courses Added Successfully.")
@@ -164,6 +174,7 @@ def AddCourse():
 
 # Function to remove a course from the database
 def DeleteCourse():
+    global isModified
     # Ask User for Course name
     courseName = input("Enter course Name: ")
 
@@ -182,6 +193,7 @@ def DeleteCourse():
             final = db.execute("DELETE FROM grades WHERE name = ?", checkNew[0]["name"])
             if final != 0:
                 print(f"{checkNew} Successfully Deleted")
+                isModified = True
                 time.sleep(1)
             else:
                 print("Error. No Course Found.")
@@ -192,6 +204,7 @@ def DeleteCourse():
 
 # Function to Modify score of inputted data in database
 def ModifyCourse():
+    global isModified
     # Ask User for Course name
     courseName = input("Enter course Name: ")
 
@@ -231,6 +244,7 @@ def ModifyCourse():
                         if final != 0:
                             print(f"{courseName} Successfully Updated. New Code: {newCode}")
                             selectedCourse[0]["code"] = newCode
+                            isModified = True
                             time.sleep(1)
                         else:
                             print("Error: No course found.")
@@ -246,6 +260,7 @@ def ModifyCourse():
                         if final != 0:
                             print(f"{courseName} Successfully Updated. New Name: {newName}")
                             selectedCourse[0]["name"] = newName
+                            isModified = True
                             time.sleep(1)
                         else:
                             print("Error: No course found.")
@@ -271,6 +286,7 @@ def ModifyCourse():
                         if final != 0:
                             print(f"{courseName} Successfully Updated. New score: {newScore}")
                             selectedCourse[0]["score"] = newScore
+                            isModified = True
                             time.sleep(1)
                         else:
                             print("Error: No course found.")
@@ -286,6 +302,7 @@ def ModifyCourse():
                         if final != 0:
                             print(f"{courseName} Successfully Updated. New Credit: {newCredit}")
                             selectedCourse[0]["credit"] = newCredit
+                            isModified = True
                             time.sleep(1)
                         else:
                             print("Error: No course found.")
@@ -307,6 +324,10 @@ def DisplayDatabase():
     df = pd.read_sql_query("SELECT * FROM grades", conn)
 
     # Change score to letter grade
+    if df.empty:
+        print("No courses Found. Add courses to database to view them.")
+        time.sleep(2)
+        return -1
     df = ChangeScores(df)
 
     # Print out dataFrame
@@ -345,7 +366,10 @@ def ChangeScores(df:pd.DataFrame):
     return df
 
 # Function to Calculate GPA
-def CalculateGPA(GetGPA = 0):
+def CalculateGPA(GetGPA = 0, manual = 0):
+    global isModified, cached
+    if not isModified and len(cached) > 0:
+        return cached
     # Prepare list of associations
     GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
 
@@ -496,9 +520,12 @@ def CalculateGPA(GetGPA = 0):
     try:
         GPA = round(totalPoints/totalHours, 3)
         if GetGPA == 0:
-            print(f"Calculated GPA: {GPA}")
+            print(f"Total Hours: {totalHours}\nCalculated GPA: {GPA}")
         time.sleep(1)
-        return totalPoints, totalHours
+        if manual == 0:
+            cached = [totalPoints, totalHours]
+        isModified = False
+        return cached
     except ZeroDivisionError:
         print("No Courses Found. Try again.")
         time.sleep(1)
