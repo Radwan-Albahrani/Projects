@@ -38,7 +38,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Added Caching for faster GPA Display"
+    updateMessage = "Loading bar for extracting data from SIS"
     checkForUpdate(updateMessage)
 
     while True:
@@ -925,11 +925,11 @@ def DataExtractor():
     finalList = []
 
     # Loop through list and add any Taken courses, except for courses that have IP as a grade
-    for i in range(len(startList)):
+    translator = Translator()
+    for i in tqdm(range(len(startList)), leave=False):
         if startList[i] == "Taken":
             if startList[i-2] == "IP" or startList[i-2] == "NP" or startList[i-2] == "NF" or startList[i-2] == "W":
                 continue
-            translator = Translator()
             subject = translator.translate(startList[i-4])
             subject = subject.text
             finalList.append(startList[i-5] + "," + str(subject) + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
