@@ -38,7 +38,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Loading bar for extracting data from SIS"
+    updateMessage = "Fix GPA Calculations for Really Low Grades"
     checkForUpdate(updateMessage)
 
     while True:
@@ -346,7 +346,7 @@ def DisplayDatabase():
 # change the scores of a dataFrame
 def ChangeScores(df:pd.DataFrame):
     # Dictionary to convert to letters
-    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A ", (85, 90) : "B+", (80, 85) : "B ", (75, 80): "C+", (70 , 75) : "C ", (67, 70) : "D+", (60, 67) : "D ", (0, 60) : "F "}
+    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A ", (85, 90) : "B+", (80, 85) : "B ", (75, 80): "C+", (70 , 75) : "C ", (65, 70) : "D+", (60, 65) : "D ", (0, 60) : "F "}
 
     # Loop over the DataFrame
     for index, row in df.iterrows():
@@ -371,7 +371,7 @@ def CalculateGPA(GetGPA = 0, manual = 0):
     if not isModified and len(cached) > 0:
         return cached
     # Prepare list of associations
-    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (60, 70) : 2.50, (0, 60) : 2.00}
+    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (65, 70) : 2.50, (60, 65) : 2.00, (0, 60) : 1.00}
 
     # prepare total points and total hours
     totalPoints = 0
@@ -615,7 +615,7 @@ def GetSubjectsPredict(subjects, totalHours):
 # Calculate all Predictions
 def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
     # Prepare list of associations
-    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D ", 2.00 : "F "}
+    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D+", 2.00 : "D ", 1.00 : "F "}
 
     # Start a loop to keep the user here until they are done with the function
     expectedGPA = 0
