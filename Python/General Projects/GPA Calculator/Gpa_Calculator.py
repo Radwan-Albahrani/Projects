@@ -38,7 +38,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fix GPA Calculations for Really Low Grades"
+    updateMessage = "Fix Unverified HTTPS Request Error"
     checkForUpdate(updateMessage)
 
     while True:
@@ -901,13 +901,23 @@ def DataExtractor():
     }
 
     # Send in request and get to appropriate page for grades
-    with requests.session() as s:
-        s.post(loginUrl, data=formData)
-        r = s.get(returnURl)
-        f = BeautifulSoup(r.content, "html.parser")
-        if "Oracle PeopleSoft" in f.prettify():
-            print("Login Failed. Ensure you have the correct Username and Password.")
-            return -1
+    try:
+        with requests.session() as s:
+            s.post(loginUrl, data=formData)
+            r = s.get(returnURl)
+            f = BeautifulSoup(r.content, "html.parser")
+            if "Oracle PeopleSoft" in f.prettify():
+                print("Login Failed. Ensure you have the correct Username and Password.")
+                return -1
+    except Exception as e:
+        print("Certificate Verification Failed.")
+        with requests.session() as s:
+            s.post(loginUrl, data=formData, verify=False)
+            r = s.get(returnURl)
+            f = BeautifulSoup(r.content, "html.parser")
+            if "Oracle PeopleSoft" in f.prettify():
+                print("Login Failed. Ensure you have the correct Username and Password.")
+                return -1
 
     # Remove any HTML
     text = f.getText()
