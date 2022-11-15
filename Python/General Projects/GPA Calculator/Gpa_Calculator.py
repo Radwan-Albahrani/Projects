@@ -15,6 +15,10 @@ from tqdm import tqdm
 from itertools import repeat
 from sympy.utilities.iterables import multiset_combinations, multiset_permutations
 from googletrans import Translator
+from urllib3.exceptions import InsecureRequestWarning
+
+# Disable Insecure Request Warning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Disable requests logging
 logging.disable(logging.CRITICAL)
@@ -38,7 +42,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fix Unverified HTTPS Request Error"
+    updateMessage = "Disabled Some Warnings"
     checkForUpdate(updateMessage)
 
     while True:
@@ -910,7 +914,7 @@ def DataExtractor():
                 print("Login Failed. Ensure you have the correct Username and Password.")
                 return -1
     except Exception as e:
-        print("Certificate Verification Failed.")
+        print("Certificate Verification Failed. This is an issue from the University Website. Request Will be made without SSL verification. \n\nFind out More here: https://www.sslshopper.com/ssl-checker.html#hostname=https://sis.iau.edu.sa/psp/hcs9prd/EMPLOYEE/SA/?&cmd=login&languageCd=ENG\nMaking Request....")
         with requests.session() as s:
             s.post(loginUrl, data=formData, verify=False)
             r = s.get(returnURl)
