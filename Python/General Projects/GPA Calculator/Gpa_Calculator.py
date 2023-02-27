@@ -36,13 +36,14 @@ except FileExistsError:
 isModified = True
 cached = []
 
+
 # Main Function
 def main():
     # Global Variable
     global isModified
 
     # Check if an update is available
-    updateMessage = "Disabled Some Warnings"
+    updateMessage = "Changed Icon | added Modified to getting from SIS"
     checkForUpdate(updateMessage)
 
     while True:
@@ -89,35 +90,39 @@ def main():
                 exitRoutine()
                 break
 
+
 # Function to open database
 def OpenDatabase():
     # First, Try to access the grades database. If it does not exist, create a new one and access it.
+    try:
+        db = SQL("sqlite:///" + path + "/grades.db")
+    except RuntimeError:
+        open(path + "/grades.db", "w").close()
+        db = SQL("sqlite:///" + path + "/grades.db")
+
+    # Check if accessed database already has a table.
+    answer = db.execute(
+        "SELECT COUNT(name) FROM sqlite_master WHERE type='table'")
+    answer = answer[0]["COUNT(name)"]
+
+    # If database does not have a table, create a table and fill it from the csv file
+    if answer != 1:
+        db.execute(
+            "CREATE TABLE grades (code TEXT, name TEXT, score NUMBER, credit NUMBER)")
         try:
-            db = SQL("sqlite:///" + path + "/grades.db")
-        except RuntimeError:
-            open(path + "/grades.db", "w").close()
-            db = SQL("sqlite:///" + path + "/grades.db")
+            with open(path + "/Grades.csv", encoding="utf8") as file:
+                reader = csv.reader(file)
+                row1 = next(reader)
+                for row in reader:
+                    db.execute("INSERT INTO grades VALUES(?)", row)
 
-        # Check if accessed database already has a table.
-        answer = db.execute("SELECT COUNT(name) FROM sqlite_master WHERE type='table'")
-        answer = answer[0]["COUNT(name)"]
+        except FileNotFoundError:
+            # Open New CSV file
+            with open(path + "/Grades.csv", "w", newline='', encoding="utf8") as file:
+                pass
 
-        # If database does not have a table, create a table and fill it from the csv file
-        if answer != 1:
-            db.execute("CREATE TABLE grades (code TEXT, name TEXT, score NUMBER, credit NUMBER)")
-            try:
-                with open(path + "/Grades.csv", encoding="utf8") as file:
-                    reader = csv.reader(file)
-                    row1 = next(reader)
-                    for row in reader:
-                        db.execute("INSERT INTO grades VALUES(?)", row)
+    return db
 
-            except FileNotFoundError:
-                # Open New CSV file
-                with open(path + "/Grades.csv", "w", newline='', encoding="utf8") as file:
-                    pass
-
-        return db
 
 # Function to add a course to the database
 def AddCourse():
@@ -135,13 +140,16 @@ def AddCourse():
     while counter > 0:
 
         # Get first course information (code, name, grade, and credit hours)
-        courseCode = input(f"Enter Course [code] for course Number {courseNo}: ").upper()
-        courseName = input(f"Enter Course [name] for course Number {courseNo}: ")
+        courseCode = input(
+            f"Enter Course [code] for course Number {courseNo}: ").upper()
+        courseName = input(
+            f"Enter Course [name] for course Number {courseNo}: ")
 
         # Loop
         while True:
             # Ask user for grade
-            courseGrade = input(f"Enter Course [grade] in (Letter or percentage) for course number {courseNo}: ")
+            courseGrade = input(
+                f"Enter Course [grade] in (Letter or percentage) for course number {courseNo}: ")
 
             # Validate grade with function
             courseGrade = GetScore(courseGrade)
@@ -153,8 +161,8 @@ def AddCourse():
             else:
                 break
 
-
-        courseCredit = get_float(f"Enter [Credit hours] for course Number {courseNo}: ")
+        courseCredit = get_float(
+            f"Enter [Credit hours] for course Number {courseNo}: ")
 
         # Append course to course list to add to database later
         courseList.append([courseCode, courseName, courseGrade, courseCredit])
@@ -176,6 +184,7 @@ def AddCourse():
     print("All Courses Added Successfully.")
     time.sleep(1)
 
+
 # Function to remove a course from the database
 def DeleteCourse():
     global isModified
@@ -194,7 +203,8 @@ def DeleteCourse():
 
         # If confirmed, delete it and notify user
         if answer == "y" or answer == "Y":
-            final = db.execute("DELETE FROM grades WHERE name = ?", checkNew[0]["name"])
+            final = db.execute(
+                "DELETE FROM grades WHERE name = ?", checkNew[0]["name"])
             if final != 0:
                 print(f"{checkNew} Successfully Deleted")
                 isModified = True
@@ -205,6 +215,7 @@ def DeleteCourse():
         else:
             print("Action Cancelled")
             time.sleep(1)
+
 
 # Function to Modify score of inputted data in database
 def ModifyCourse():
@@ -242,11 +253,13 @@ def ModifyCourse():
                         newCode = input("Enter New Course Code: ").upper()
 
                         # Try to add it to database
-                        final = db.execute("UPDATE grades SET code = ? WHERE name = ?", newCode, selectedCourse[0]["name"])
+                        final = db.execute(
+                            "UPDATE grades SET code = ? WHERE name = ?", newCode, selectedCourse[0]["name"])
 
                         # If modified successfully, inform user.
                         if final != 0:
-                            print(f"{courseName} Successfully Updated. New Code: {newCode}")
+                            print(
+                                f"{courseName} Successfully Updated. New Code: {newCode}")
                             selectedCourse[0]["code"] = newCode
                             isModified = True
                             time.sleep(1)
@@ -258,11 +271,13 @@ def ModifyCourse():
                         newName = input("Enter New Course Name: ")
 
                         # Try to add it to database
-                        final = db.execute("UPDATE grades SET name = ? WHERE name = ?", newName, selectedCourse[0]["name"])
+                        final = db.execute(
+                            "UPDATE grades SET name = ? WHERE name = ?", newName, selectedCourse[0]["name"])
 
                         # If modified successfully, inform user.
                         if final != 0:
-                            print(f"{courseName} Successfully Updated. New Name: {newName}")
+                            print(
+                                f"{courseName} Successfully Updated. New Name: {newName}")
                             selectedCourse[0]["name"] = newName
                             isModified = True
                             time.sleep(1)
@@ -273,7 +288,8 @@ def ModifyCourse():
                         # While it has not been received
                         while True:
                             # Get a score from the user
-                            newScore = input("Enter new score in letter or percentage: ")
+                            newScore = input(
+                                "Enter new score in letter or percentage: ")
 
                             # Get the accurate score from the function
                             newScore = GetScore(newScore)
@@ -286,9 +302,11 @@ def ModifyCourse():
                                 break
 
                         # Once score is correct, update database if possible
-                        final = db.execute("UPDATE grades SET score = ? WHERE name = ?", newScore, selectedCourse[0]["name"])
+                        final = db.execute(
+                            "UPDATE grades SET score = ? WHERE name = ?", newScore, selectedCourse[0]["name"])
                         if final != 0:
-                            print(f"{courseName} Successfully Updated. New score: {newScore}")
+                            print(
+                                f"{courseName} Successfully Updated. New score: {newScore}")
                             selectedCourse[0]["score"] = newScore
                             isModified = True
                             time.sleep(1)
@@ -300,11 +318,13 @@ def ModifyCourse():
                         newCredit = get_int("Enter New Course Credit: ")
 
                         # Try to add it to database
-                        final = db.execute("UPDATE grades SET credit = ? WHERE name = ?", newCredit, selectedCourse[0]["name"])
+                        final = db.execute(
+                            "UPDATE grades SET credit = ? WHERE name = ?", newCredit, selectedCourse[0]["name"])
 
                         # If modified successfully, inform user.
                         if final != 0:
-                            print(f"{courseName} Successfully Updated. New Credit: {newCredit}")
+                            print(
+                                f"{courseName} Successfully Updated. New Credit: {newCredit}")
                             selectedCourse[0]["credit"] = newCredit
                             isModified = True
                             time.sleep(1)
@@ -315,6 +335,7 @@ def ModifyCourse():
         else:
             print("Action Cancelled.")
             time.sleep(1)
+
 
 # Function to display Database
 def DisplayDatabase():
@@ -347,10 +368,12 @@ def DisplayDatabase():
     # Sleep for a bit so user can view.
     time.sleep(5)
 
+
 # change the scores of a dataFrame
-def ChangeScores(df:pd.DataFrame):
+def ChangeScores(df: pd.DataFrame):
     # Dictionary to convert to letters
-    GPAconvert = {(95, 100) : "A+" , (90, 95) : "A ", (85, 90) : "B+", (80, 85) : "B ", (75, 80): "C+", (70 , 75) : "C ", (65, 70) : "D+", (60, 65) : "D ", (0, 60) : "F "}
+    GPAconvert = {(95, 100): "A+", (90, 95): "A ", (85, 90): "B+", (80, 85): "B ",
+                  (75, 80): "C+", (70, 75): "C ", (65, 70): "D+", (60, 65): "D ", (0, 60): "F "}
 
     # Loop over the DataFrame
     for index, row in df.iterrows():
@@ -369,13 +392,15 @@ def ChangeScores(df:pd.DataFrame):
     # Return the modified DataFrame
     return df
 
+
 # Function to Calculate GPA
-def CalculateGPA(GetGPA = 0, manual = 0):
+def CalculateGPA(GetGPA=0, manual=0):
     global isModified, cached
     if not isModified and len(cached) > 0:
         return cached
     # Prepare list of associations
-    GPAconvert = {(95, 100) : 5.00 , (90, 95) : 4.75, (85, 90) : 4.50, (80, 85) : 4.00, (75, 80): 3.50, (70 , 75) : 3.00, (65, 70) : 2.50, (60, 65) : 2.00, (0, 60) : 1.00}
+    GPAconvert = {(95, 100): 5.00, (90, 95): 4.75, (85, 90): 4.50, (80, 85): 4.00,
+                  (75, 80): 3.50, (70, 75): 3.00, (65, 70): 2.50, (60, 65): 2.00, (0, 60): 1.00}
 
     # prepare total points and total hours
     totalPoints = 0
@@ -385,7 +410,8 @@ def CalculateGPA(GetGPA = 0, manual = 0):
     if GetGPA == 0:
         while True:
             # Ask user for input
-            question = input("Cumulative GPA (using Database) or term GPA (Manual Input)? (1 for [Using Database], 2 for [Manual Input]): ")
+            question = input(
+                "Cumulative GPA (using Database) or term GPA (Manual Input)? (1 for [Using Database], 2 for [Manual Input]): ")
 
             # If user wants cumulative score:
             if question == "1":
@@ -400,7 +426,8 @@ def CalculateGPA(GetGPA = 0, manual = 0):
                 credits = db.execute("SELECT credit FROM grades")
 
                 # Get number of subjects
-                subjects = get_int("Please input the number of subjects you want to test (0 if already in database): ")
+                subjects = get_int(
+                    "Please input the number of subjects you want to test (0 if already in database): ")
 
                 # Get out of loop.
                 break
@@ -412,14 +439,16 @@ def CalculateGPA(GetGPA = 0, manual = 0):
                 credits = []
 
                 # Ask if you want to input previous GPA
-                previous = input("Do you want to input your previous GPA? (y/n): ")
+                previous = input(
+                    "Do you want to input your previous GPA? (y/n): ")
 
                 # Get previous GPA data
                 while True:
                     if previous.lower() == "y":
                         # Get previous and credit
                         currentGPA = get_float("Enter your previous GPA: ")
-                        totalCredit = get_int("Enter your total credit hours so far: ")
+                        totalCredit = get_int(
+                            "Enter your total credit hours so far: ")
 
                         # Add to total points and total credit
                         totalPoints = currentGPA * totalCredit
@@ -432,7 +461,8 @@ def CalculateGPA(GetGPA = 0, manual = 0):
                         print("Invalid input.")
                         continue
                 # Get number of subjects
-                subjects = get_int("Please input the number of subjects you want to test: ")
+                subjects = get_int(
+                    "Please input the number of subjects you want to test: ")
                 if subjects == 0:
                     print("No Subjects Entered")
                 # Get out of loop
@@ -465,12 +495,14 @@ def CalculateGPA(GetGPA = 0, manual = 0):
     # While not done with subjects
     while subjects > 0:
         # Get credit and score from user
-        currentCredit = get_int(f"Please input credit hours for subject number {subjectCounter}: ")
+        currentCredit = get_int(
+            f"Please input credit hours for subject number {subjectCounter}: ")
 
         # loop
         while True:
             # Get a score from the user
-            currentScore = input(f"Please input score for subject number {subjectCounter}: ")
+            currentScore = input(
+                f"Please input score for subject number {subjectCounter}: ")
 
             # Get the accurate score from the function
             currentScore = GetScore(currentScore)
@@ -482,13 +514,12 @@ def CalculateGPA(GetGPA = 0, manual = 0):
             else:
                 break
 
-
         # Increment subject counter
         subjectCounter += 1
 
         # Append score and credit to their appropriate lists
-        scores.append({'score' : currentScore})
-        credits.append({'credit' : currentCredit})
+        scores.append({'score': currentScore})
+        credits.append({'credit': currentCredit})
 
         # Reduce subjects by 1.
         subjects -= 1
@@ -535,6 +566,7 @@ def CalculateGPA(GetGPA = 0, manual = 0):
         time.sleep(1)
         return [-1, -1]
 
+
 # Predict GPA scores
 def PredictiveSetup():
     maxSubjects = 7
@@ -555,7 +587,8 @@ def PredictiveSetup():
 
     # Confirm Maximum subjects with user
     if subjects > maxSubjects:
-        predictContinue = input("Too many subjects to predict. This function will only tell you the maximum GPA. Do you want to continue? (y/n): ")
+        predictContinue = input(
+            "Too many subjects to predict. This function will only tell you the maximum GPA. Do you want to continue? (y/n): ")
         if predictContinue.lower() != "y":
             return
     if subjects <= 0:
@@ -584,6 +617,7 @@ def PredictiveSetup():
     # Start the prediction Process
     CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints)
 
+
 # Get subjects for predictive Function
 def GetSubjectsPredict(subjects, totalHours):
     names = []
@@ -592,7 +626,8 @@ def GetSubjectsPredict(subjects, totalHours):
     # While not done with subjects
     while subjects > 0:
         # Get Subject Name
-        subjectName = input(f"Enter the name of Subject number: {subjectCounter}: ")
+        subjectName = input(
+            f"Enter the name of Subject number: {subjectCounter}: ")
         if subjectName not in names:
             names.append(subjectName)
         else:
@@ -600,10 +635,12 @@ def GetSubjectsPredict(subjects, totalHours):
             continue
 
         # Get credit and score from user
-        currentCredit = get_int(f"Please input credit hours for {subjectName}: ")
+        currentCredit = get_int(
+            f"Please input credit hours for {subjectName}: ")
 
         # Append score and credit to their appropriate lists
-        scores.append({"name" : subjectName, "SubjectNumber" : subjectCounter, "credit" : currentCredit})
+        scores.append(
+            {"name": subjectName, "SubjectNumber": subjectCounter, "credit": currentCredit})
 
         # Add hours
         totalHours += currentCredit
@@ -616,10 +653,12 @@ def GetSubjectsPredict(subjects, totalHours):
 
     return scores, totalHours
 
+
 # Calculate all Predictions
 def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
     # Prepare list of associations
-    GPAconvert = {5.00 : "A+" , 4.75 : "A ", 4.50 : "B+", 4.00 : "B ", 3.50: "C+", 3.00 : "C ", 2.50 : "D+", 2.00 : "D ", 1.00 : "F "}
+    GPAconvert = {5.00: "A+", 4.75: "A ", 4.50: "B+", 4.00: "B ",
+                  3.50: "C+", 3.00: "C ", 2.50: "D+", 2.00: "D ", 1.00: "F "}
 
     # Start a loop to keep the user here until they are done with the function
     expectedGPA = 0
@@ -629,17 +668,20 @@ def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
         listCounter = 0
 
         # Get expected GPA
-        expectedGPA = get_float("What do you want your GPA to be (-1 to go back to menu): ")
+        expectedGPA = get_float(
+            "What do you want your GPA to be (-1 to go back to menu): ")
         if expectedGPA == -1:
             break
         # If expected is bigger than Maximum
         if expectedGPA > maximumGPA:
-            print(f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
+            print(
+                f"GPA cannot be achieved as it exceeds the maximum GPA {maximumGPA} which you can get this term.")
             continue
 
         # Get possible GPAs then remove any unnecessary Values
         GPAValues = list(GPAconvert.keys())
-        GPAValues = _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints)
+        GPAValues = _removeExtra(
+            scores, GPAValues, expectedGPA, totalHours, totalPoints)
 
         # Repeat and get all possible combinations
         GPAValues = [x for item in GPAValues for x in repeat(item, subjects)]
@@ -668,7 +710,8 @@ def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
                 if loopGPA >= expectedGPA:
                     permutationsFound.append({})
                     for score in scores:
-                        permutationsFound[listCounter][score["name"]] = score["LetterGrade"]
+                        permutationsFound[listCounter][score["name"]
+                                                       ] = score["LetterGrade"]
                     permutationsFound[listCounter]["GPA"] = loopGPA
                     listCounter += 1
 
@@ -677,12 +720,14 @@ def CalculatePredict(subjects, maximumGPA, scores, totalHours, totalPoints):
         printableData = pd.DataFrame(permutationsFound)
         printableData = printableData.sort_values("GPA")
         printableData = printableData.reset_index(drop=True)
-        print(printableData.loc[printableData["GPA"] == printableData["GPA"][0]])
+        print(printableData.loc[printableData["GPA"]
+              == printableData["GPA"][0]])
+
 
 # Remove unnecessary values in GPA prediction
 def _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints):
     # Get the lowest Credit
-    lowestCredit = min(scores, key=lambda x:x['credit'])
+    lowestCredit = min(scores, key=lambda x: x['credit'])
     lowestCredit = lowestCredit["credit"]
 
     # Get total points
@@ -708,13 +753,15 @@ def _removeExtra(scores, GPAValues, expectedGPA, totalHours, totalPoints):
     # Return new optimized list
     return GPAValues
 
+
 # Function to select specific course from database
 def SelectCourse(courseName):
-    #Open Database
+    # Open Database
     db = OpenDatabase()
 
     # Check if the course name is available
-    check = db.execute("SELECT * FROM grades WHERE name LIKE ?", f"%{courseName}%")
+    check = db.execute(
+        "SELECT * FROM grades WHERE name LIKE ?", f"%{courseName}%")
 
     # If multiple courses found:
     if len(check) > 1:
@@ -723,12 +770,14 @@ def SelectCourse(courseName):
         conn = sqlite3.connect(path + '/grades.db')
 
         # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
+        print("Courses Selected: \n" + str(pd.read_sql_query(
+            f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
 
         # Start a loop
         while True:
             # Ask user to select a course by code.
-            courseCode = input("Please Select one of the courses by typing its code: ")
+            courseCode = input(
+                "Please Select one of the courses by typing its code: ")
 
             # Check if code is found, and if it is, select it and put it into a new list
             for i in range(len(check)):
@@ -762,13 +811,16 @@ def SelectCourse(courseName):
         # Connect to database
         conn = sqlite3.connect(path + '/grades.db')
         # Print database using Pandas so its clean
-        print("Courses Selected: \n" + str(pd.read_sql_query(f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
+        print("Courses Selected: \n" + str(pd.read_sql_query(
+            f"SELECT * FROM grades WHERE name LIKE '%{courseName}%'", conn)))
         return checkNew
+
 
 # Function to check and convert score based on if its a letter or a percentage
 def GetScore(score):
     # Dictionary to convert score
-    GPAconvertLetters = {("A+", "a+") : 100 , ("A", "a") : 90, ("B+", "b+") : 85, ("B", "b") : 80, ("C+", "c+"): 75, ("C" , "c") : 70, ("D+", "d+") : 68, ("D", "d") : 65,  ("F", "f") : 0}
+    GPAconvertLetters = {("A+", "a+"): 100, ("A", "a"): 90, ("B+", "b+"): 85, ("B", "b"): 80,
+                         ("C+", "c+"): 75, ("C", "c"): 70, ("D+", "d+"): 68, ("D", "d"): 65,  ("F", "f"): 0}
 
     try:
         # if it passed as a percentage, check it, then return it
@@ -788,6 +840,8 @@ def GetScore(score):
     return -1
 
 # Exit Routine
+
+
 def exitRoutine():
     # Open Database
     db = OpenDatabase()
@@ -807,16 +861,18 @@ def exitRoutine():
         for i in data:
             writer.writerow(i.values())
 
+
 # Function to Check for update
 def checkForUpdate(currentMessage):
     # Try to get the latest commit and compare the names. Else. Tell the user something is wrong with the internet
     try:
-        response = requests.get('https://api.github.com/repos/Radwan-Albahrani/Projects/commits?path=Python/General%20Projects/GPA%20Calculator&%20&page=1').json()
+        response = requests.get(
+            'https://api.github.com/repos/Radwan-Albahrani/Projects/commits?path=Python/General%20Projects/GPA%20Calculator&%20&page=1').json()
         newMessage = response[0]['commit']['message']
     except Exception as e:
-        print("Something went wrong with the update checker. Check your internet connection.")
+        print(
+            "Something went wrong with the update checker. Check your internet connection.")
         return 0
-
 
     # Check if the commit message matches the coded in message.
     if currentMessage == newMessage:
@@ -863,9 +919,9 @@ def checkForUpdate(currentMessage):
                 os.mkdir("New")
                 # Creating Progress Bar
                 progressBar = tqdm(total=totalSize,
-                    unit_scale=True,
-                    bar_format = "{desc}: {percentage:.2f}%|{bar}| {n_fmt}/{total_fmt} {remaining}",
-                    desc="Downloading New GPA Calculator")
+                                   unit_scale=True,
+                                   bar_format="{desc}: {percentage:.2f}%|{bar}| {n_fmt}/{total_fmt} {remaining}",
+                                   desc="Downloading New GPA Calculator")
                 # Open a new file in binary
                 with open("New/GPA_Calculator.exe", 'wb') as file:
                     # Loop through the download in chunks to create progress bar
@@ -888,8 +944,12 @@ def checkForUpdate(currentMessage):
                 print("Hmm. An error has occurred. Maybe check your internet? \n\n")
                 print("Error Message: \n" + str(e))
 
+
 # Function to get Data from IAU Website
 def DataExtractor():
+    # is Modified Variable
+    global isModified
+
     # Needed URLs
     loginUrl = "https://sis.iau.edu.sa/psp/hcs9prd/EMPLOYEE/SA/?&cmd=login&languageCd=ENG"
     returnURl = "https://sis.iau.edu.sa/psc/hcs9prd_60/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_CRSE_HIST_FL.GBL"
@@ -946,7 +1006,8 @@ def DataExtractor():
                 continue
             subject = translator.translate(startList[i-4])
             subject = subject.text
-            finalList.append(startList[i-5] + "," + str(subject) + "," + str(GetScore(startList[i-2])) + "," + startList[i-1])
+            finalList.append(startList[i-5] + "," + str(subject) + "," +
+                             str(GetScore(startList[i-2])) + "," + startList[i-1])
 
     # Create CSV file
     with open(path + "/Grades.csv", "w", encoding="utf8") as file:
@@ -961,9 +1022,13 @@ def DataExtractor():
     # Create new DB file
     OpenDatabase()
 
+    # Mark as Modified
+    isModified = True
+
     # Tell user
     print("Data Extracted Successfully")
     time.sleep(2)
+
 
 if __name__ == "__main__":
     try:
@@ -975,7 +1040,8 @@ if __name__ == "__main__":
         except FileExistsError:
             pass
         logging.disable(logging.NOTSET)
-        logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
+        logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
         logging.exception(e)
         print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
         time.sleep(3)
