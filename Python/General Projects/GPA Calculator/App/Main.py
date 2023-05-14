@@ -16,7 +16,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Removed Unnecessary Imports"
+    updateMessage = "Fixed Crash on Predictive Function"
     checkForUpdate(updateMessage)
 
     while True:
@@ -62,20 +62,3 @@ def main():
             case 8:
                 exitRoutine()
                 break
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        try:
-            time.sleep(0.1)
-            os.mkdir("CrashLog")
-        except FileExistsError:
-            pass
-        logging.disable(logging.NOTSET)
-        logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG,
-                            format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
-        logging.exception(e)
-        print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
-        time.sleep(3)

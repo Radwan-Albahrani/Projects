@@ -15,7 +15,6 @@ logging.disable(logging.CRITICAL)
 
 # Predict GPA scores
 def PredictiveSetup():
-    raise NotImplementedError
     maxSubjects = 7
 
     # Get Total points and total hours from the GPA function
