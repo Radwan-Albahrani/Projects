@@ -43,7 +43,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Changed Icon | added Modified to getting from SIS"
+    updateMessage = "Fixed Translate Bug"
     checkForUpdate(updateMessage)
 
     while True:
@@ -1004,8 +1004,14 @@ def DataExtractor():
         if startList[i] == "Taken":
             if startList[i-2] == "IP" or startList[i-2] == "NP" or startList[i-2] == "NF" or startList[i-2] == "W":
                 continue
-            subject = translator.translate(startList[i-4])
-            subject = subject.text
+            try:
+                subject = translator.translate(startList[i-4])
+                subject = subject.text
+            except Exception as e:
+                subject = startList[i-4]
+                print(
+                    f"Could not translate subject: {subject}. Message: {getattr(e, 'message', repr(e))}")
+                print("Using Original Name")
             finalList.append(startList[i-5] + "," + str(subject) + "," +
                              str(GetScore(startList[i-2])) + "," + startList[i-1])
 
