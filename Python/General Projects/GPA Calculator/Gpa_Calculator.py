@@ -14,7 +14,7 @@ from sqlalchemy import false
 from tqdm import tqdm
 from itertools import repeat
 from sympy.utilities.iterables import multiset_combinations, multiset_permutations
-from googletrans import Translator
+from python_translator import Translator
 from urllib3.exceptions import InsecureRequestWarning
 
 # Disable Insecure Request Warning
@@ -43,7 +43,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Made getting subjects faster"
+    updateMessage = "Switched Translation Library to improve accuracy"
     checkForUpdate(updateMessage)
 
     while True:
@@ -1011,10 +1011,9 @@ def DataExtractor():
             # If it is not english, Try to translate it
             if not subject.isascii():
                 try:
-                    subject = translator.translate(subject, dest="en")
-                    if subject != None and subject.text != None and subject.text != "":
-                        subject = subject.text
-                    else:
+                    subject = translator.translate(
+                        subject, target_language="en", source_language="ar")
+                    if subject == None:
                         subject = startList[i-4]
                         print(
                             f"Could not translate subject: {subject}. Using Original Name.")
