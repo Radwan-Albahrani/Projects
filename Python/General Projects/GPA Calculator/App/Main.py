@@ -2,22 +2,12 @@
 import logging
 import os
 import os
-import csv
 import time
-import pandas as pd
-import requests
 import logging
-import sys
-
 from .core.Predictive import PredictiveSetup
 from .core.Updates import checkForUpdate
 from .API.DatabaseConnector import *
-from cs50 import get_int, get_float
-from tqdm import tqdm
-from itertools import repeat
-from sympy.utilities.iterables import multiset_combinations, multiset_permutations
-from pwinput import pwinput
-from python_translator import Translator
+from cs50 import get_int
 
 
 # Main Function
@@ -26,7 +16,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fixed Update Method to account for new path"
+    updateMessage = "Removed Unnecessary Imports"
     checkForUpdate(updateMessage)
 
     while True:
