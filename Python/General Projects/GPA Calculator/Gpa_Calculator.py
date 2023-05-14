@@ -43,7 +43,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fixed Translate Bug"
+    updateMessage = "Made getting subjects faster"
     checkForUpdate(updateMessage)
 
     while True:
@@ -1004,14 +1004,28 @@ def DataExtractor():
         if startList[i] == "Taken":
             if startList[i-2] == "IP" or startList[i-2] == "NP" or startList[i-2] == "NF" or startList[i-2] == "W":
                 continue
-            try:
-                subject = translator.translate(startList[i-4])
-                subject = subject.text
-            except Exception as e:
-                subject = startList[i-4]
-                print(
-                    f"Could not translate subject: {subject}. Message: {getattr(e, 'message', repr(e))}")
-                print("Using Original Name")
+
+            # Get the subject
+            subject = startList[i-4]
+
+            # If it is not english, Try to translate it
+            if not subject.isascii():
+                try:
+                    subject = translator.translate(subject, dest="en")
+                    if subject != None and subject.text != None and subject.text != "":
+                        subject = subject.text
+                    else:
+                        subject = startList[i-4]
+                        print(
+                            f"Could not translate subject: {subject}. Using Original Name.")
+
+                # If Error in translation, just add it normally.
+                except Exception as e:
+                    subject = startList[i-4]
+                    print(
+                        f"Could not translate subject: {subject}. Using Original Name.")
+
+            # Append to final list
             finalList.append(startList[i-5] + "," + str(subject) + "," +
                              str(GetScore(startList[i-2])) + "," + startList[i-1])
 
