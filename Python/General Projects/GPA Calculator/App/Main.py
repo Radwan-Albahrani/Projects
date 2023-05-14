@@ -26,7 +26,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Code restructuring and bug fixes."
+    updateMessage = "Fixed Update Method to account for new path"
     checkForUpdate(updateMessage)
 
     while True:

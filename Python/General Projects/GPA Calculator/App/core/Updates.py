@@ -50,7 +50,7 @@ def checkForUpdate(currentMessage):
         update = input("Do you want to Install the new Update? (y/n): ")
         # If they do, get the new file
         if update.lower() == "y":
-            url = "https://github.com/JackyXteam/Projects/blob/master/Python/General%20Projects/GPA%20Calculator/Gpa_Calculator.exe?raw=true"
+            url = "https://github.com/Radwan-Albahrani/Projects/blob/master/Python/General%20Projects/GPA%20Calculator/executable/GPA_Calculator.exe?raw=true"
             # Try to get the new file and download it
             try:
                 # Get the Download
