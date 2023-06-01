@@ -5,9 +5,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service as EdgeService
 from time import sleep
+from pwinput import pwinput
+
+
 
 options = webdriver.EdgeOptions()
 options.add_argument('headless')
+options.add_argument('--disable-logging')
+options.add_argument('--log-level=1')
 browser = webdriver.Edge(service=EdgeService(
     EdgeChromiumDriverManager().install()), options=options)
 
@@ -15,7 +20,7 @@ browser = webdriver.Edge(service=EdgeService(
 browser.get('https://estibana.iau.edu.sa/')
 
 username = input("Enter your Username: ")
-password = input("Enter your Password: ")
+password = pwinput("Enter your Password: ")
 browser.find_element(By.ID, 'userNameInput').send_keys(username)
 browser.find_element(By.ID, 'passwordInput').send_keys(password)
 browser.find_element(By.ID, 'submitButton').click()
@@ -32,8 +37,9 @@ while True:
     score = 0
     if speedup == 'y':
         while True:
-            score = input("How would you like to rate All courses and Instructors: ")
-            if score < 1 or score > 5:
+            score = input(
+                "How would you like to rate All courses and Instructors: ")
+            if int(score) < 1 or int(score) > 5:
                 print("Please enter a valid score")
                 continue
             else:
@@ -118,4 +124,5 @@ while True:
         sleep(1)
     except Exception as e:
         print("Done With Instructors!")
+        sleep(2)
         break
