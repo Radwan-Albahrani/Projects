@@ -139,9 +139,9 @@ if __name__ == "__main__":
             os.mkdir("CrashLog")
         except FileExistsError:
             pass
-    logging.disable(logging.NOTSET)
-    logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
-    logging.exception(e)
-    print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
-    sleep(3)
+        logging.disable(logging.NOTSET)
+        logging.basicConfig(filename=r"CrashLog/ErrorLog.log", level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
+        logging.exception(e)
+        print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
+        sleep(3)
