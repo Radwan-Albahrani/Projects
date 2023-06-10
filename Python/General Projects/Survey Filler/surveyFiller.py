@@ -9,30 +9,36 @@ from pwinput import pwinput
 import os
 import logging
 
-
-
-options = webdriver.EdgeOptions()
-options.add_argument('headless')
-options.add_argument('--disable-logging')
-options.add_argument('--log-level=1')
-browser = webdriver.Edge(service=EdgeService(
-    EdgeChromiumDriverManager().install()), options=options)
-
-
-browser.get('https://estibana.iau.edu.sa/')
-
-username = input("Enter your Username: ")
-password = pwinput("Enter your Password: ")
-browser.find_element(By.ID, 'userNameInput').send_keys(username)
-browser.find_element(By.ID, 'passwordInput').send_keys(password)
-browser.find_element(By.ID, 'submitButton').click()
+logging.disable(logging.CRITICAL)
 def programRoutine():
+    try:
+        options = webdriver.EdgeOptions()
+        options.add_argument('headless')
+        options.add_argument('--disable-logging')
+        options.add_argument('--log-level=1')
+        browser = webdriver.Edge(service=EdgeService(
+            EdgeChromiumDriverManager().install()), options=options)
+    except Exception as e:
+        print("Please install or update Edge Chromium from this link: https://www.microsoft.com/en-us/edge")
+        sleep(3)
+        raise e
+
+
+    browser.get('https://estibana.iau.edu.sa/')
+
+    username = input("Enter your Username: ")
+    password = pwinput("Enter your Password: ")
+    browser.find_element(By.ID, 'userNameInput').send_keys(username)
+    browser.find_element(By.ID, 'passwordInput').send_keys(password)
+    browser.find_element(By.ID, 'submitButton').click()
+
     try:
         browser.find_element(
             By.XPATH, "/html/body/form/div[5]/header/div/div[3]/ul/li[1]")
         print("Successfully logged in")
     except:
-        print("Login Failed")
+        print("Login Failed. Try again.")
+        sleep(2)
         exit(1)
     while True:
         speedup = input("Would you like to speed up the process? (y/n): ")
