@@ -8,7 +8,7 @@ from tkinter import filedialog
 
 # A program that puts all students into the list.
 def selectoriginal():
-    if password.get() == "radwan158":
+    if password.get() == "password":
         sel_list.delete(0,END)
         connection_v = sqlite3.connect(r"my_data\users.db")
         cursor_v = connection_v.cursor()
