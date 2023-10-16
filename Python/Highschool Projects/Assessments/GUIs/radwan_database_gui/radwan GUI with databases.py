@@ -17,7 +17,7 @@ def selectoriginal():
         for allitems in All_list1:
             sel_list.insert(END,allitems)
 def selectoriginal1(event):
-    if password.get() == "radwan158":
+    if password.get() == "password":
         sel_list.delete(0,END)
         connection_v = sqlite3.connect(r"my_data\users.db")
         cursor_v = connection_v.cursor()
