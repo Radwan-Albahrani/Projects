@@ -16,7 +16,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fixed Crash on Predictive Function"
+    updateMessage = "Reduced redundant Predictions"
     checkForUpdate(updateMessage)
 
     while True:
