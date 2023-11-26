@@ -16,7 +16,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Fixed Grades Scraping"
+    updateMessage = "Fixed new wrong login error."
     checkForUpdate(updateMessage)
 
     while True:

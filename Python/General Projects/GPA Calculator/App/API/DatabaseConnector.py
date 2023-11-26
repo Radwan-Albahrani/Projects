@@ -369,7 +369,7 @@ def DataExtractor():
             s.post(loginUrl, data=formData)
             r = s.get(returnURl)
             f = BeautifulSoup(r.content, "html.parser")
-            if "Oracle PeopleSoft" in f.prettify():
+            if "User ID" in f.prettify():
                 print("Login Failed. Ensure you have the correct Username and Password.")
                 return -1
     except Exception as e:
