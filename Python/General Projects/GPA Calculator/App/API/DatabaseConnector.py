@@ -350,8 +350,8 @@ def SelectCourse(courseName):
 def DataExtractor():
 
     # Needed URLs
-    loginUrl = "https://sis.iau.edu.sa/psp/hcs9prd/EMPLOYEE/SA/?&cmd=login&languageCd=ENG"
-    returnURl = "https://sis.iau.edu.sa/psc/hcs9prd_60/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_CRSE_HIST_FL.GBL"
+    loginUrl = "https://sis.iau.edu.sa/psp/ps/?cmd=login&languageCd=ENG&"
+    returnURl = "https://sis.iau.edu.sa/psc/ps_6/EMPLOYEE/SA/c/SSR_STUDENT_ACAD_REC_FL.SSR_CRSE_HIST_FL.GBL"
 
     # Get Username and Password From User:
     username = input("Enter your Username: ")

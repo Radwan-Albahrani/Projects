@@ -16,7 +16,7 @@ def main():
     global isModified
 
     # Check if an update is available
-    updateMessage = "Reduced redundant Predictions"
+    updateMessage = "Fixed Grades Scraping"
     checkForUpdate(updateMessage)
 
     while True:
