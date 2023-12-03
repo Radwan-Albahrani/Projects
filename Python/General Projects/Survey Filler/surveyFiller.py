@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*
 from selenium import webdriver
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.remote.remote_connection import LOGGER
+
 from time import sleep
 from pwinput import pwinput
 import os
@@ -13,11 +16,14 @@ logging.disable(logging.CRITICAL)
 def programRoutine():
     try:
         options = webdriver.EdgeOptions()
-        options.add_argument('headless')
-        options.add_argument('--disable-logging')
-        options.add_argument('--log-level=1')
-        browser = webdriver.Edge(service=EdgeService(
-            EdgeChromiumDriverManager().install()), options=options)
+        options.add_argument("--headless=new")
+        options.add_argument("--inprivate")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--log-level=3")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--window-size=1920,1080")
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        browser = webdriver.Edge(options=options)
     except Exception as e:
         print("Please install or update Edge Chromium from this link: https://www.microsoft.com/en-us/edge")
         sleep(3)
@@ -69,6 +75,11 @@ def programRoutine():
                 print(f"The course title is: {title}")
                 while True:
                     score = input("How would you like to rate this course: ")
+                    try:
+                        score = int(score)
+                    except:
+                        print("Please enter a valid score")
+                        continue
                     if score < 1 or score > 5:
                         print("Please enter a valid score")
                         continue
@@ -104,9 +115,13 @@ def programRoutine():
             title = browser.find_element(By.ID, 'cphMainContent_lblFaculty').text
             if speedup == "n":
                 print(f"The Instructor is: {title}")
-                score = input("How would you like to rate this Instructor: ")
                 while True:
-                    score = input("How would you like to rate this course: ")
+                    score = input("How would you like to rate this instructor: ")
+                    try:
+                        score = int(score)
+                    except:
+                        print("Please enter a valid score")
+                        continue
                     if score < 1 or score > 5:
                         print("Please enter a valid score")
                         continue
@@ -150,4 +165,4 @@ if __name__ == "__main__":
                             format='%(asctime)s %(levelname)s %(name)s %(message)s', force=True)
         logging.exception(e)
         print("Error has been logged in a file called \"CrashLogs\". Please Send it to creator to fix this crash!")
-        sleep(3)
+        sleep(1)
